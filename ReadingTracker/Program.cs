@@ -1,1 +1,56 @@
-﻿Console.WriteLine("Hello, World!");
+﻿DisplayEntryMessage();
+
+//TODO: Move selection to a method
+int selectedOption;
+
+Console.WriteLine("Select an option:");
+
+while (true)
+{
+    var userInput = Console.ReadLine();
+    var isValid = int.TryParse(userInput, out selectedOption);
+
+    if (isValid && selectedOption is >= 0 and <= 8)
+    {
+        break;
+    }
+
+    Console.WriteLine("Select an option between 0 and 8:");
+}
+
+switch (selectedOption)
+{
+    case 1:
+    case 2:
+    case 3:
+    case 4:
+    case 5:
+    case 6:
+    case 7:
+    case 8:
+    case 0:
+        {
+            throw new NotImplementedException();
+        }
+}
+
+void DisplayEntryMessage()
+{
+    Console.WriteLine(@"
+================================
+     PERSONAL READING TRACKER
+================================
+
+1. My library
+2. Search books online
+3. Add a book manually
+4. Update reading progress
+5. Change reading status
+6. Search and filter my books
+7. Reading statistics
+8. Export library
+0. Exit
+");
+}
+
+Console.ReadKey();
