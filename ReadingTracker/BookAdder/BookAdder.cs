@@ -1,3 +1,6 @@
+using System.Text.Json;
+using System.Text.Json.Serialization;
+
 namespace ReadingTracker.BookAdder;
 
 public class BookAdder
@@ -19,6 +22,12 @@ Reading status:
 Select status:", input => input is >= 1 and < 4);
 
         var rating = PromptOptionalInt("\nYour rating (0-5, or skip): ");
+
+
+        //XXX: For testing purposes. Should be refactored later
+        var bookToBeAdded = new BookDto(title, author, publicationYear, totalPages);
+        var json = JsonSerializer.Serialize(bookToBeAdded);
+        Console.WriteLine(json);
 
         Console.WriteLine("\nBook added successfully!");
     }
@@ -84,3 +93,10 @@ Select status:", input => input is >= 1 and < 4);
         return validated;
     }
 }
+
+public record BookDto(
+    [property: JsonPropertyName("title")] string Title,
+    [property: JsonPropertyName("author")] string Author,
+    [property: JsonPropertyName("publicationYear")] int? PublicationYear,
+    [property: JsonPropertyName("totalPages")] int? TotalPages
+);

@@ -44,33 +44,6 @@ switch (selectedOption)
 }
 
 //XXX: Methods. Should be splitted into their own classes later.
-{
-    Console.WriteLine("========== ADD BOOK MANUALLY ==========");
-    Console.WriteLine("Title:");
-    var title = Console.ReadLine();
-
-    Console.WriteLine("Author:");
-    var author = Console.ReadLine();
-
-    Console.WriteLine("Publication year:");
-    var publicatioYear = Console.ReadLine();
-
-    Console.WriteLine("Total pages:");
-    var totalPages = Console.ReadLine();
-
-    Console.WriteLine(@"
-Reading status:
-1. Want to Read
-2. Reading
-3. Completed
-Select status:");
-    var selectedReadingStatus = Console.ReadLine();
-
-    Console.WriteLine("\nYour rating (0-5, or skip): ");
-    var rating = Console.ReadLine();
-
-    Console.WriteLine("\nBook added successfully!");
-}
 
 void DisplayEntryMessage()
 {
