@@ -1,4 +1,8 @@
-﻿DisplayEntryMessage();
+﻿using ReadingTracker.BookAdder;
+
+var bookAdder = new BookAdder();
+
+DisplayEntryMessage();
 
 //TODO: Move selection to a method
 int selectedOption;
@@ -34,14 +38,12 @@ switch (selectedOption)
 
     case 3:
         {
-            AddBookManually();
+            bookAdder.Add();
             break;
         }
 }
 
 //XXX: Methods. Should be splitted into their own classes later.
-
-void AddBookManually()
 {
     Console.WriteLine("========== ADD BOOK MANUALLY ==========");
     Console.WriteLine("Title:");
