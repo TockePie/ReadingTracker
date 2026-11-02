@@ -19,13 +19,21 @@ Reading status:
 1. Want to Read
 2. Reading
 3. Completed
-Select status:", input => input is >= 1 and < 4);
+Select status:", input => input is >= 1 and < 4) - 1;
 
         var rating = PromptOptionalInt("\nYour rating (0-5, or skip): ");
 
 
         //XXX: For testing purposes. Should be refactored later
-        var bookToBeAdded = new BookDto(title, author, publicationYear, totalPages);
+        var bookToBeAdded = new BookDto(
+            title,
+            author,
+            publicationYear,
+            totalPages,
+            (ReadingStatus)selectedReadingStatus,
+            rating
+        );
+
         var json = JsonSerializer.Serialize(bookToBeAdded);
         Console.WriteLine(json);
 
@@ -98,5 +106,17 @@ public record BookDto(
     [property: JsonPropertyName("title")] string Title,
     [property: JsonPropertyName("author")] string Author,
     [property: JsonPropertyName("publicationYear")] int? PublicationYear,
-    [property: JsonPropertyName("totalPages")] int? TotalPages
+    [property: JsonPropertyName("totalPages")] int? TotalPages,
+    [property: JsonPropertyName("status")]
+    [property: JsonConverter(typeof(JsonStringEnumConverter))]
+    ReadingStatus Status,
+    [property: JsonPropertyName("rating")] int? Rating
 );
+
+[JsonConverter(typeof(JsonStringEnumConverter))]
+public enum ReadingStatus
+{
+    WantToRead,
+    Reading,
+    Completed
+}
