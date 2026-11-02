@@ -1,6 +1,19 @@
-﻿using ReadingTracker.BookAdder;
+﻿using ReadingTracker;
+using ReadingTracker.BookAdder;
 
-var bookAdder = new BookAdder();
+var notImplemented = new NotImplementedMenuAction();
+var menuActions = new Dictionary<int, IMenuAction>
+{
+    { 0, notImplemented },
+    { 1, notImplemented },
+    { 2, notImplemented },
+    { 3, new BookAdder() },
+    { 4, notImplemented },
+    { 5, notImplemented },
+    { 6, notImplemented },
+    { 7, notImplemented },
+    { 8, notImplemented }
+};
 
 DisplayEntryMessage();
 
@@ -22,26 +35,7 @@ while (true)
     Console.WriteLine("Select an option between 0 and 8:");
 }
 
-switch (selectedOption)
-{
-    case 1:
-    case 2:
-    case 4:
-    case 5:
-    case 6:
-    case 7:
-    case 8:
-    case 0:
-        {
-            throw new NotImplementedException();
-        }
-
-    case 3:
-        {
-            bookAdder.Execute();
-            break;
-        }
-}
+menuActions[selectedOption].Execute();
 
 //XXX: Methods. Should be splitted into their own classes later.
 
@@ -65,3 +59,12 @@ void DisplayEntryMessage()
 }
 
 Console.ReadKey();
+
+public class NotImplementedMenuAction : IMenuAction
+{
+
+    public void Execute()
+    {
+        throw new NotImplementedException();
+    }
+}
