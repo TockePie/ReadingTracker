@@ -1,28 +1,40 @@
 using System.Text.Json;
-using System.Text.Json.Serialization;
 
 namespace ReadingTracker.BookAdder;
 
-public class BookAdder
+public class BookAdder : IMenuAction
 {
-    public void Add()
+    public void Execute()
     {
         Console.WriteLine("========== ADD BOOK MANUALLY ==========");
 
         var title = PromptString("Title:");
         var author = PromptString("Author:");
-        var publicationYear = PromptOptionalInt("Publication year:", input => input is > 0 and <= 2026);
+        var publicationYear = PromptOptionalInt(
+            "Publication year:",
+            input => input is > 0 and <= 2026
+        );
         var totalPages = PromptOptionalInt("Total pages:");
 
-        var selectedReadingStatus = PromptInt(@"
+        var selectedReadingStatus =
+            PromptInt(
+                @"
 Reading status:
 1. Want to Read
 2. Reading
 3. Completed
-Select status:", input => input is >= 1 and < 4) - 1;
+Select status:",
+                input => input is >= 1 and < 4
+            ) - 1;
 
-        var rating = PromptOptionalInt("\nYour rating (0-5, or skip): ");
+        var rating = PromptOptionalInt(
+            "\nYour rating (0-5, or skip): ",
+            input => input is >= 0 and <= 5
+        );
 
+        // XXX: The logic of saving it to a file should be present here
+
+        Console.WriteLine("\nBook added successfully!");
 
         //XXX: For testing purposes. Should be refactored later
         var bookToBeAdded = new BookDto(
@@ -36,8 +48,6 @@ Select status:", input => input is >= 1 and < 4) - 1;
 
         var json = JsonSerializer.Serialize(bookToBeAdded);
         Console.WriteLine(json);
-
-        Console.WriteLine("\nBook added successfully!");
     }
 
     //TODO: Refactor later to use method chaining like this:
@@ -85,12 +95,13 @@ Select status:", input => input is >= 1 and < 4) - 1;
         while (true)
         {
             var basePrompt = PromptString(message);
-            var isValid = int.TryParse(basePrompt, out validated);
+            if (string.IsNullOrWhiteSpace(basePrompt))
+            {
+                return null;
+            }
 
-            if (basePrompt == string.Empty ||
-                isValid && (condition is null ||
-                condition(validated))
-            )
+            var isValid = int.TryParse(basePrompt, out validated);
+            if (isValid && (condition is null || condition(validated)))
             {
                 break;
             }
@@ -100,23 +111,4 @@ Select status:", input => input is >= 1 and < 4) - 1;
 
         return validated;
     }
-}
-
-public record BookDto(
-    [property: JsonPropertyName("title")] string Title,
-    [property: JsonPropertyName("author")] string Author,
-    [property: JsonPropertyName("publicationYear")] int? PublicationYear,
-    [property: JsonPropertyName("totalPages")] int? TotalPages,
-    [property: JsonPropertyName("status")]
-    [property: JsonConverter(typeof(JsonStringEnumConverter))]
-    ReadingStatus Status,
-    [property: JsonPropertyName("rating")] int? Rating
-);
-
-[JsonConverter(typeof(JsonStringEnumConverter))]
-public enum ReadingStatus
-{
-    WantToRead,
-    Reading,
-    Completed
 }

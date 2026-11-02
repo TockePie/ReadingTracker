@@ -38,7 +38,7 @@ switch (selectedOption)
 
     case 3:
         {
-            bookAdder.Add();
+            bookAdder.Execute();
             break;
         }
 }
