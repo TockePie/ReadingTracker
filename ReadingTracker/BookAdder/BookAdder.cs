@@ -1,23 +1,27 @@
 using System.Text.Json;
+using ReadingTracker.Prompter;
 
 namespace ReadingTracker.BookAdder;
 
-public class BookAdder : IMenuAction
+public class BookAdder(IPrompter prompter) : IMenuAction
 {
+    private readonly IPrompter _prompter = prompter;
+
     public void Execute()
     {
         Console.WriteLine("========== ADD BOOK MANUALLY ==========");
 
-        var title = PromptString("Title:");
-        var author = PromptString("Author:");
-        var publicationYear = PromptOptionalInt(
+        var title = _prompter.Ask("Title:");
+        var author = _prompter.Ask("Author:");
+        var publicationYear = _prompter.AskInt(
             "Publication year:",
+            isOptional: true,
             input => input is > 0 and <= 2026
         );
-        var totalPages = PromptOptionalInt("Total pages:");
+        var totalPages = _prompter.AskInt("Total pages:", isOptional: true);
 
         var selectedReadingStatus =
-            PromptInt(
+            _prompter.AskInt(
                 @"
 Reading status:
 1. Want to Read
@@ -27,8 +31,9 @@ Select status:",
                 input => input is >= 1 and < 4
             ) - 1;
 
-        var rating = PromptOptionalInt(
+        var rating = _prompter.AskInt(
             "\nYour rating (0-5, or skip): ",
+            isOptional: true,
             input => input is >= 0 and <= 5
         );
 
@@ -48,67 +53,5 @@ Select status:",
 
         var json = JsonSerializer.Serialize(bookToBeAdded);
         Console.WriteLine(json);
-    }
-
-    //TODO: Refactor later to use method chaining like this:
-    // Prompt("message").ToInt().WithCondition(...).Optional();
-    private string PromptString(string message)
-    {
-        Console.Write(message);
-        return Console.ReadLine()?.Trim() ?? string.Empty;
-    }
-
-    private int PromptInt(string message)
-    {
-        return PromptInt(message, condition: null);
-    }
-
-    private int PromptInt(string message, Func<int, bool>? condition)
-    {
-        int validated;
-
-        while (true)
-        {
-            var basePrompt = PromptString(message);
-            var isValid = int.TryParse(basePrompt, out validated);
-
-            if (isValid && (condition is null || condition(validated)))
-            {
-                break;
-            }
-
-            Console.WriteLine("You entered invalid number. Try again");
-        }
-
-        return validated;
-    }
-
-    private int? PromptOptionalInt(string message)
-    {
-        return PromptOptionalInt(message, condition: null);
-    }
-
-    private int? PromptOptionalInt(string message, Func<int, bool>? condition)
-    {
-        int validated;
-
-        while (true)
-        {
-            var basePrompt = PromptString(message);
-            if (string.IsNullOrWhiteSpace(basePrompt))
-            {
-                return null;
-            }
-
-            var isValid = int.TryParse(basePrompt, out validated);
-            if (isValid && (condition is null || condition(validated)))
-            {
-                break;
-            }
-
-            Console.WriteLine("You entered invalid number. Try again");
-        }
-
-        return validated;
     }
 }
