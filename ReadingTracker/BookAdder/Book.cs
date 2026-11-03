@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace ReadingTracker.BookAdder;
 
-public record BookDto(
+public record Book(
     [property: JsonPropertyName("title")]
     string Title,
 
@@ -20,5 +20,12 @@ public record BookDto(
     ReadingStatus Status,
 
     [property: JsonPropertyName("rating")]
-    int? Rating
-);
+    int? Rating,
+
+    [property: JsonPropertyName("currentPage")]
+    int CurrentPage = 0
+)
+{
+    [JsonPropertyName("id")]
+    public Guid Id { get; init; } = Guid.NewGuid();
+}

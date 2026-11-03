@@ -1,6 +1,7 @@
 ﻿using ReadingTracker;
 using ReadingTracker.BookAdder;
 using ReadingTracker.Prompter;
+using ReadingTracker.Storage;
 
 var notImplemented = new NotImplementedMenuAction();
 var menuActions = new Dictionary<int, IMenuAction>
@@ -8,7 +9,7 @@ var menuActions = new Dictionary<int, IMenuAction>
     { 0, notImplemented },
     { 1, notImplemented },
     { 2, notImplemented },
-    { 3, new BookAdder(new Prompter()) },
+    { 3, new BookAdder(new Prompter(), new JsonStorage()) },
     { 4, notImplemented },
     { 5, notImplemented },
     { 6, notImplemented },

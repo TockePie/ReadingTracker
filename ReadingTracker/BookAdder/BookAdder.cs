@@ -1,11 +1,12 @@
-using System.Text.Json;
 using ReadingTracker.Prompter;
+using ReadingTracker.Storage;
 
 namespace ReadingTracker.BookAdder;
 
-public class BookAdder(IPrompter prompter) : IMenuAction
+public class BookAdder(IPrompter prompter, IStorage storage) : IMenuAction
 {
     private readonly IPrompter _prompter = prompter;
+    private readonly IStorage _storage = storage;
 
     public void Execute()
     {
@@ -20,16 +21,14 @@ public class BookAdder(IPrompter prompter) : IMenuAction
         );
         var totalPages = _prompter.AskInt("Total pages:", isOptional: true);
 
-        var selectedReadingStatus =
-            _prompter.AskInt(
-                @"
+        var selectedReadingStatus = _prompter.AskInt(@"
 Reading status:
 1. Want to Read
 2. Reading
 3. Completed
 Select status:",
-                input => input is >= 1 and < 4
-            ) - 1;
+            input => input is >= 1 and < 4
+        ) - 1;
 
         var rating = _prompter.AskInt(
             "\nYour rating (0-5, or skip): ",
@@ -37,12 +36,7 @@ Select status:",
             input => input is >= 0 and <= 5
         );
 
-        // XXX: The logic of saving it to a file should be present here
-
-        Console.WriteLine("\nBook added successfully!");
-
-        //XXX: For testing purposes. Should be refactored later
-        var bookToBeAdded = new BookDto(
+        var bookToBeAdded = new Book(
             title,
             author,
             publicationYear,
@@ -51,7 +45,8 @@ Select status:",
             rating
         );
 
-        var json = JsonSerializer.Serialize(bookToBeAdded);
-        Console.WriteLine(json);
+        _storage.Save("books.json", bookToBeAdded).GetAwaiter().GetResult();
+
+        Console.WriteLine("\nBook added successfully!");
     }
 }
