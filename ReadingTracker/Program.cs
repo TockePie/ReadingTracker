@@ -59,12 +59,3 @@ void DisplayEntryMessage()
 }
 
 Console.ReadKey();
-
-public class NotImplementedMenuAction : IMenuAction
-{
-
-    public void Execute()
-    {
-        throw new NotImplementedException();
-    }
-}
