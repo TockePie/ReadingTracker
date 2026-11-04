@@ -52,6 +52,9 @@ public class BookAdderTests
     }
 
     [TestCase("The Hobbit", "J.R.R. Tolkien", 1920, 123, 1, null)]
+    [TestCase("Echoes of the Rustland", "Marcus Sterling", 1999, null, 3, null)]
+    [TestCase("Midnight at the Clockwork Bazaar", "Amina Al-Mansoor", null, null, 1, null)]
+    [TestCase("The Glass Aviary", "Siobhan O'Connor", 2005, 180, 1, 3)]
     public void Execute_ShouldSaveBookToStorage(
         string title,
         string author,
