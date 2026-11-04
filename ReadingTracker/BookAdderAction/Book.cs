@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
 
-namespace ReadingTracker.BookAdder;
+namespace ReadingTracker.BookAdderAction;
 
 public record Book(
     [property: JsonPropertyName("title")]

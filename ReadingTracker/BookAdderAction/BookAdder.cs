@@ -1,7 +1,7 @@
 using ReadingTracker.Prompter;
 using ReadingTracker.Storage;
 
-namespace ReadingTracker.BookAdder;
+namespace ReadingTracker.BookAdderAction;
 
 public class BookAdder(IPrompter prompter, IStorage storage) : IMenuAction
 {
@@ -31,7 +31,7 @@ Select status:",
         ) - 1;
 
         var rating = _prompter.AskInt(
-            "\nYour rating (0-5, or skip): ",
+            "\nYour rating (0-5, or skip):",
             isOptional: true,
             input => input is >= 0 and <= 5
         );

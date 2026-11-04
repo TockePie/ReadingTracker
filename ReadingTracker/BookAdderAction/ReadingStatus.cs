@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
 
-namespace ReadingTracker.BookAdder;
+namespace ReadingTracker.BookAdderAction;
 
 [JsonConverter(typeof(JsonStringEnumConverter))]
 public enum ReadingStatus
