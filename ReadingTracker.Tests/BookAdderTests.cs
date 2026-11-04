@@ -75,13 +75,13 @@ public class BookAdderTests
         );
 
         _mockStorage
-            .Setup(fn => fn.Save(It.IsAny<string>(), It.IsAny<Book>()))
+            .Setup(fn => fn.Save(It.IsAny<Book>()))
             .Returns(Task.CompletedTask);
 
         _bookAdder.Execute();
 
         _mockStorage.Verify(
-            fn => fn.Save("books.json", It.Is<Book>(b =>
+            fn => fn.Save(It.Is<Book>(b =>
                 b.Title == title &&
                 b.Author == author &&
                 b.PublicationYear == year &&

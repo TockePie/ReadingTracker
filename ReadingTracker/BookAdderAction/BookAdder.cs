@@ -45,7 +45,7 @@ Select status:",
             rating
         );
 
-        _storage.Save("books.json", bookToBeAdded).GetAwaiter().GetResult();
+        _storage.Save(bookToBeAdded).GetAwaiter().GetResult();
 
         Console.WriteLine("\nBook added successfully!");
     }

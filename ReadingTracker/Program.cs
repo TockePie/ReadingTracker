@@ -9,7 +9,7 @@ var menuActions = new Dictionary<int, IMenuAction>
     { 0, notImplemented },
     { 1, notImplemented },
     { 2, notImplemented },
-    { 3, new BookAdder(new Prompter(), new JsonStorage()) },
+    { 3, new BookAdder(new Prompter(), new JsonStorage("books.json")) },
     { 4, notImplemented },
     { 5, notImplemented },
     { 6, notImplemented },
