@@ -1,15 +1,17 @@
 ﻿using ReadingTracker;
 using ReadingTracker.BookAdderAction;
+using ReadingTracker.MyLibraryAction;
 using ReadingTracker.Prompter;
 using ReadingTracker.Storage;
 
 var notImplemented = new NotImplementedMenuAction();
+var jsonStorage = new JsonStorage("books.json");
 var menuActions = new Dictionary<int, IMenuAction>
 {
     { 0, notImplemented },
-    { 1, notImplemented },
+    { 1, new MyLibrary(jsonStorage) },
     { 2, notImplemented },
-    { 3, new BookAdder(new Prompter(), new JsonStorage("books.json")) },
+    { 3, new BookAdder(new Prompter(), jsonStorage) },
     { 4, notImplemented },
     { 5, notImplemented },
     { 6, notImplemented },
