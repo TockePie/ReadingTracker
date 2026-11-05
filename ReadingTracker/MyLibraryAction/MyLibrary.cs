@@ -1,9 +1,10 @@
 using ReadingTracker.BookAdderAction;
+using ReadingTracker.Prompter;
 using ReadingTracker.Storage;
 
 namespace ReadingTracker.MyLibraryAction;
 
-public class MyLibrary(IStorage storage) : IMenuAction
+public class MyLibrary(IPrompter prompter, IStorage storage) : IMenuAction
 {
     public void Execute()
     {
@@ -18,6 +19,18 @@ public class MyLibrary(IStorage storage) : IMenuAction
         }
 
         DisplayBooks(savedBooks);
+
+        Console.WriteLine("\n--------------------------------");
+
+        var selectedOption = prompter.AskInt(@"
+1. View book details
+2. Edit book information
+3. Remove a book
+4. Back to main menu",
+            input => input is >= 1 and < 5
+        );
+
+        //TODO: Implement options above
     }
 
     private void DisplayBooks(List<Book> savedBooks)
