@@ -40,18 +40,22 @@ public class MyLibrary(IPrompter prompter, IStorage storage) : IMenuAction
                 }
             case 2:
             case 3:
-            case 4:
                 {
                     throw new NotImplementedException();
+                }
+
+            case 4:
+                {
+                    return;
                 }
         }
     }
 
-    private void DisplayBooks(List<Book> savedBooks)
+    private static void DisplayBooks(IReadOnlyList<Book> books)
     {
-        for (int i = 0; i < savedBooks.Count; i++)
+        for (int i = 0; i < books.Count; i++)
         {
-            var book = savedBooks[i];
+            var book = books[i];
 
             var progressSuffix = book.TotalPages > 0
                 ? $"/{book.TotalPages} ({book.CompletionRate}%)"
@@ -62,20 +66,22 @@ public class MyLibrary(IPrompter prompter, IStorage storage) : IMenuAction
         }
     }
 
-    private void AskBookDetails(List<Book> savedBooks)
+    private void AskBookDetails(IReadOnlyList<Book> books)
     {
-        var selectedBook = prompter.AskInt("\nEnter book's ID: ", isOptional: true);
-        if (selectedBook is not int bookIndex)
+        var selectedId = prompter.AskInt("\nEnter book's ID: ", isOptional: true);
+        if (selectedId is not int bookId)
         {
             return;
         }
 
-        if (bookIndex < 0 || bookIndex >= savedBooks.Count)
+        var bookIndex = bookId - 1;
+        if (bookIndex < 0 || bookIndex >= books.Count)
         {
+            Console.WriteLine($"\nNo book found with ID: {bookId}");
             return;
         }
 
-        var foundBook = savedBooks[bookIndex];
+        var foundBook = books[bookIndex];
 
         //TODO: Make the output prettier
         Console.WriteLine(foundBook);
