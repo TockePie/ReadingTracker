@@ -8,7 +8,7 @@ public class MyLibrary(IPrompter prompter, IStorage storage) : IMenuAction
 {
     public void Execute()
     {
-        Console.WriteLine("========== MY LIBRARY ==========");
+        Console.WriteLine("\n========== MY LIBRARY ==========");
 
         var savedBooks = storage.Get<Book>().GetAwaiter().GetResult();
 
@@ -26,11 +26,25 @@ public class MyLibrary(IPrompter prompter, IStorage storage) : IMenuAction
 1. View book details
 2. Edit book information
 3. Remove a book
-4. Back to main menu",
+4. Back to main menu
+",
             input => input is >= 1 and < 5
         );
 
-        //TODO: Implement options above
+        switch (selectedOption)
+        {
+            case 1:
+                {
+                    AskBookDetails(savedBooks);
+                    break;
+                }
+            case 2:
+            case 3:
+            case 4:
+                {
+                    throw new NotImplementedException();
+                }
+        }
     }
 
     private void DisplayBooks(List<Book> savedBooks)
@@ -46,5 +60,24 @@ public class MyLibrary(IPrompter prompter, IStorage storage) : IMenuAction
             Console.WriteLine($"\nID: {i + 1} | {book.Title} - {book.Author}");
             Console.WriteLine($"\tStatus: {book.Status} | Progress: {book.CurrentPage}{progressSuffix}");
         }
+    }
+
+    private void AskBookDetails(List<Book> savedBooks)
+    {
+        var selectedBook = prompter.AskInt("\nEnter book's ID: ", isOptional: true);
+        if (selectedBook is not int bookIndex)
+        {
+            return;
+        }
+
+        if (bookIndex < 0 || bookIndex >= savedBooks.Count)
+        {
+            return;
+        }
+
+        var foundBook = savedBooks[bookIndex];
+
+        //TODO: Make the output prettier
+        Console.WriteLine(foundBook);
     }
 }
