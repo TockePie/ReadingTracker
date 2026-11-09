@@ -1,9 +1,6 @@
-﻿using ReadingTracker;
-using ReadingTracker.BookAdderAction;
-using ReadingTracker.MyLibraryAction;
+﻿using ReadingTracker.Actions;
 using ReadingTracker.Prompter;
 using ReadingTracker.Storage;
-using ReadingTracker.UpdateReadingProgressAction;
 
 var prompter = new Prompter();
 var jsonStorage = new JsonStorage("books.json");

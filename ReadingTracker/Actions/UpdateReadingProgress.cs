@@ -2,7 +2,7 @@ using ReadingTracker.Models;
 using ReadingTracker.Prompter;
 using ReadingTracker.Storage;
 
-namespace ReadingTracker.UpdateReadingProgressAction;
+namespace ReadingTracker.Actions;
 
 public class UpdateReadingProgress(IPrompter prompter, IStorage storage) : IMenuAction
 {

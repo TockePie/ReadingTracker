@@ -2,7 +2,7 @@ using ReadingTracker.Models;
 using ReadingTracker.Prompter;
 using ReadingTracker.Storage;
 
-namespace ReadingTracker.MyLibraryAction;
+namespace ReadingTracker.Actions;
 
 public class MyLibrary(IPrompter prompter, IStorage storage) : IMenuAction
 {

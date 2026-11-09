@@ -2,7 +2,7 @@ using ReadingTracker.Models;
 using ReadingTracker.Prompter;
 using ReadingTracker.Storage;
 
-namespace ReadingTracker.BookAdderAction;
+namespace ReadingTracker.Actions;
 
 public class BookAdder(IPrompter prompter, IStorage storage) : IMenuAction
 {

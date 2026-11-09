@@ -1,4 +1,4 @@
-namespace ReadingTracker;
+namespace ReadingTracker.Actions;
 
 public class ExitAction : IMenuAction
 {
