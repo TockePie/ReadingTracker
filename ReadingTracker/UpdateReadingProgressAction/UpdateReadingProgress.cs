@@ -6,6 +6,8 @@ namespace ReadingTracker.UpdateReadingProgressAction;
 
 public class UpdateReadingProgress(IPrompter prompter, IStorage storage) : IMenuAction
 {
+    public string Description => "Update reading progress";
+
     public void Execute()
     {
         Console.WriteLine("\n========== UPDATE READING PROGRESS ==========");

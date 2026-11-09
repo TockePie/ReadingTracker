@@ -1,10 +1,11 @@
 namespace ReadingTracker;
 
-public class NotImplementedMenuAction : IMenuAction
+public class NotImplementedMenuAction(string description) : IMenuAction
 {
+    public string Description { get; } = description;
 
     public void Execute()
     {
-        throw new NotImplementedException();
+        Console.WriteLine($"{Description} is not implemented yet.");
     }
 }

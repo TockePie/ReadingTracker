@@ -6,6 +6,8 @@ namespace ReadingTracker.MyLibraryAction;
 
 public class MyLibrary(IPrompter prompter, IStorage storage) : IMenuAction
 {
+    public string Description => "My library";
+
     public void Execute()
     {
         Console.WriteLine("\n========== MY LIBRARY ==========");

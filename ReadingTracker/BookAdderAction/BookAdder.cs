@@ -9,6 +9,8 @@ public class BookAdder(IPrompter prompter, IStorage storage) : IMenuAction
     private readonly IPrompter _prompter = prompter;
     private readonly IStorage _storage = storage;
 
+    public string Description => "Add a book manually";
+
     public void Execute()
     {
         Console.WriteLine("========== ADD BOOK MANUALLY ==========");
