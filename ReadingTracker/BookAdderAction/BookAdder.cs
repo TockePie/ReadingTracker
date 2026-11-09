@@ -12,14 +12,18 @@ public class BookAdder(IPrompter prompter, IStorage storage) : IMenuAction
     {
         Console.WriteLine("========== ADD BOOK MANUALLY ==========");
 
-        var title = _prompter.Ask("Title:");
-        var author = _prompter.Ask("Author:");
+        var title = _prompter.Ask("Title: ");
+        var author = _prompter.Ask("Author: ");
         var publicationYear = _prompter.AskInt(
-            "Publication year:",
+            "Publication year: ",
             isOptional: true,
             input => input is > 0 and <= 2026
         );
-        var totalPages = _prompter.AskInt("Total pages:", isOptional: true);
+        var totalPages = _prompter.AskInt(
+            "Total pages: ",
+            isOptional: true,
+            input => input is > 0
+        );
 
         var selectedReadingStatus = _prompter.AskInt(@"
 Reading status:
