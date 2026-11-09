@@ -3,6 +3,7 @@ using ReadingTracker.BookAdderAction;
 using ReadingTracker.MyLibraryAction;
 using ReadingTracker.Prompter;
 using ReadingTracker.Storage;
+using ReadingTracker.UpdateReadingProgressAction;
 
 var notImplemented = new NotImplementedMenuAction();
 var prompter = new Prompter();
@@ -14,7 +15,7 @@ var menuActions = new Dictionary<int, IMenuAction>
     { 1, new MyLibrary(prompter, jsonStorage) },
     { 2, notImplemented },
     { 3, new BookAdder(prompter, jsonStorage) },
-    { 4, notImplemented },
+    { 4, new UpdateReadingProgress(prompter, jsonStorage) },
     { 5, notImplemented },
     { 6, notImplemented },
     { 7, notImplemented },

@@ -33,6 +33,17 @@ public class JsonStorage(string filePath) : IStorage
         await WriteDataIntoFile(parsedList);
     }
 
+    public async Task UpdateItem<T>(Guid id, T content) where T : IEntity
+    {
+        var parsedList = await Get<T>();
+
+        var updatedList = parsedList
+            .Select(item => item.Id == id ? content : item)
+            .ToList();
+
+        await WriteDataIntoFile(updatedList);
+    }
+
     public async Task RemoveById<T>(Guid id) where T : IEntity
     {
         var parsedList = await Get<T>();
