@@ -21,10 +21,10 @@ var menuActions = new Dictionary<int, IMenuAction>
     { 0, new ExitAction() }
 };
 
-var runner = new Runner(menuActions);
+var runner = new Runner(menuActions, prompter);
 runner.Run();
 
-class Runner(Dictionary<int, IMenuAction> menuActions)
+class Runner(Dictionary<int, IMenuAction> menuActions, IPrompter prompter)
 {
     public void Run()
     {
@@ -32,22 +32,11 @@ class Runner(Dictionary<int, IMenuAction> menuActions)
         {
             DisplayEntryMessage();
 
-            int selectedOption;
-
-            Console.WriteLine("Select an option:");
-
-            while (true)
-            {
-                var userInput = Console.ReadLine();
-                var isValid = int.TryParse(userInput, out selectedOption);
-
-                if (isValid && menuActions.ContainsKey(selectedOption))
-                {
-                    break;
-                }
-
-                Console.WriteLine("Select an option between 0 and 8:");
-            }
+            var selectedOption = prompter.AskInt(
+                "Select an option: ",
+                menuActions.ContainsKey,
+                "Select an option between 0 and 8"
+            );
 
             menuActions[selectedOption].Execute();
         }
