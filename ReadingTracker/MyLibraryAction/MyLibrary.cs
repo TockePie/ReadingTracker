@@ -38,16 +38,30 @@ public class MyLibrary(IPrompter prompter, IStorage storage) : IMenuAction
             {
                 case 1:
                     {
-                        AskBookDetails(savedBooks);
+                        var isValid = TryPromptBookDetails(savedBooks, out var selectedBook);
+                        if (isValid)
+                        {
+                            PrintBookDetails(selectedBook);
+                        }
 
                         Console.WriteLine("\nPress any key to continue...");
                         Console.ReadKey(intercept: true);
                         break;
                     }
 
-                case 2 or 3:
+                case 2:
                     {
                         throw new NotImplementedException();
+                    }
+
+                case 3:
+                    {
+                        var isValid = TryPromptBookDetails(savedBooks, out var selectedBook);
+                        if (isValid)
+                        {
+                            RemoveBook(selectedBook);
+                        }
+                        return;
                     }
 
                 case 4:
@@ -74,7 +88,7 @@ public class MyLibrary(IPrompter prompter, IStorage storage) : IMenuAction
         }
     }
 
-    private void AskBookDetails(IReadOnlyList<Book> books)
+    private bool TryPromptBookDetails(IReadOnlyList<Book> books, out Book? book)
     {
         var enteredNumber = prompter.AskInt(
             "Enter book's ID (press Enter to cancel): ",
@@ -82,18 +96,21 @@ public class MyLibrary(IPrompter prompter, IStorage storage) : IMenuAction
         );
         if (enteredNumber is not int displayNumber)
         {
-            return;
+            book = null;
+            return false;
         }
 
         var bookIndex = displayNumber - 1;
         if (bookIndex < 0 || bookIndex >= books.Count)
         {
             Console.WriteLine($"\nNo book found with ID: {displayNumber}");
-            return;
+
+            book = null;
+            return false;
         }
 
-        var selectedBook = books[bookIndex];
-        PrintBookDetails(selectedBook);
+        book = books[bookIndex];
+        return true;
     }
 
     private static void PrintBookDetails(Book book)
@@ -130,8 +147,16 @@ public class MyLibrary(IPrompter prompter, IStorage storage) : IMenuAction
         Console.WriteLine("==================================");
     }
 
+    //TODO: move this method to a dedicated class
     private static void PrintField(string label, object? value)
     {
         Console.WriteLine($"{label + ":",-20} {value}");
+    }
+
+    private void RemoveBook(Book book)
+    {
+        storage.RemoveById<Book>(book.Id).GetAwaiter().GetResult();
+
+        Console.WriteLine("Book removed successfully.");
     }
 }
