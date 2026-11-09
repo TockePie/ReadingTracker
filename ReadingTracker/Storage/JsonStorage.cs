@@ -11,16 +11,6 @@ public class JsonStorage(string filePath) : IStorage
         WriteIndented = true
     };
 
-    public async Task Save<T>(T content)
-    {
-        var parsedList = await Get<T>();
-
-        parsedList.Add(content);
-
-        using var writeStream = File.Create(_filePath);
-        await JsonSerializer.SerializeAsync(writeStream, parsedList, _jsonOptions);
-    }
-
     public async Task<List<T>> Get<T>()
     {
         List<T> parsedList = [];
@@ -32,5 +22,29 @@ public class JsonStorage(string filePath) : IStorage
         }
 
         return parsedList;
+    }
+
+    public async Task Save<T>(T content)
+    {
+        var parsedList = await Get<T>();
+
+        parsedList.Add(content);
+
+        await WriteDataIntoFile(content);
+    }
+
+    public async Task RemoveById<T>(Guid id) where T : IEntity
+    {
+        var parsedList = await Get<T>();
+
+        var filteredList = parsedList.Where(item => item.Id != id).ToList();
+
+        await WriteDataIntoFile(filteredList);
+    }
+
+    private async Task WriteDataIntoFile<T>(T content)
+    {
+        using var writeStream = File.Create(_filePath);
+        await JsonSerializer.SerializeAsync(writeStream, content, _jsonOptions);
     }
 }

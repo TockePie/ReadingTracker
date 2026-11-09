@@ -1,4 +1,5 @@
 using System.Text.Json.Serialization;
+using ReadingTracker.Storage;
 
 namespace ReadingTracker.BookAdderAction;
 
@@ -24,7 +25,7 @@ public record Book(
 
     [property: JsonPropertyName("currentPage")]
     int CurrentPage = 0
-)
+) : IEntity
 {
     [JsonPropertyName("id")]
     public Guid Id { get; init; } = Guid.NewGuid();
