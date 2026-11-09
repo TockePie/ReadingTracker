@@ -11,7 +11,6 @@ public class MyLibrary(IPrompter prompter, IStorage storage) : IMenuAction
         Console.WriteLine("\n========== MY LIBRARY ==========");
 
         var savedBooks = storage.Get<Book>().GetAwaiter().GetResult();
-
         if (savedBooks is not { Count: > 0 })
         {
             Console.WriteLine("\nYour library is empty");
@@ -30,12 +29,12 @@ public class MyLibrary(IPrompter prompter, IStorage storage) : IMenuAction
 4. Back to main menu
 ");
 
-            var selectedOption = prompter.AskInt(
+            var menuChoise = prompter.AskInt(
                 "Select an option: ",
                 input => input is >= 1 and < 5
             );
 
-            switch (selectedOption)
+            switch (menuChoise)
             {
                 case 1:
                     {
@@ -64,33 +63,37 @@ public class MyLibrary(IPrompter prompter, IStorage storage) : IMenuAction
         for (int i = 0; i < books.Count; i++)
         {
             var book = books[i];
+            var displayNumber = i + 1;
 
             var progressSuffix = book.TotalPages > 0
                 ? $"/{book.TotalPages} ({book.CompletionRate}%)"
                 : string.Empty;
 
-            Console.WriteLine($"\nID: {i + 1} | {book.Title} - {book.Author}");
+            Console.WriteLine($"\nID: {displayNumber} | {book.Title} - {book.Author}");
             Console.WriteLine($"\tStatus: {book.Status} | Progress: {book.CurrentPage}{progressSuffix}");
         }
     }
 
     private void AskBookDetails(IReadOnlyList<Book> books)
     {
-        var selectedId = prompter.AskInt("Enter book's ID (press Enter to cancel): ", isOptional: true);
-        if (selectedId is not int bookId)
+        var enteredNumber = prompter.AskInt(
+            "Enter book's ID (press Enter to cancel): ",
+            isOptional: true
+        );
+        if (enteredNumber is not int displayNumber)
         {
             return;
         }
 
-        var bookIndex = bookId - 1;
+        var bookIndex = displayNumber - 1;
         if (bookIndex < 0 || bookIndex >= books.Count)
         {
-            Console.WriteLine($"\nNo book found with ID: {bookId}");
+            Console.WriteLine($"\nNo book found with ID: {displayNumber}");
             return;
         }
 
-        var foundBook = books[bookIndex];
-        PrintBookDetails(foundBook);
+        var selectedBook = books[bookIndex];
+        PrintBookDetails(selectedBook);
     }
 
     private static void PrintBookDetails(Book book)
