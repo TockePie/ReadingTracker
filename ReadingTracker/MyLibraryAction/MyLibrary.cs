@@ -20,34 +20,42 @@ public class MyLibrary(IPrompter prompter, IStorage storage) : IMenuAction
 
         DisplayBooks(savedBooks);
 
-        Console.WriteLine("\n--------------------------------");
-
-        var selectedOption = prompter.AskInt(@"
+        while (true)
+        {
+            Console.WriteLine("\n--------------------------------");
+            Console.WriteLine(@"
 1. View book details
 2. Edit book information
 3. Remove a book
 4. Back to main menu
-",
-            input => input is >= 1 and < 5
-        );
+");
 
-        switch (selectedOption)
-        {
-            case 1:
-                {
-                    AskBookDetails(savedBooks);
-                    break;
-                }
-            case 2:
-            case 3:
-                {
-                    throw new NotImplementedException();
-                }
+            var selectedOption = prompter.AskInt(
+                "Select an option: ",
+                input => input is >= 1 and < 5
+            );
 
-            case 4:
-                {
-                    return;
-                }
+            switch (selectedOption)
+            {
+                case 1:
+                    {
+                        AskBookDetails(savedBooks);
+
+                        Console.WriteLine("\nPress any key to continue...");
+                        Console.ReadKey(intercept: true);
+                        break;
+                    }
+
+                case 2 or 3:
+                    {
+                        throw new NotImplementedException();
+                    }
+
+                case 4:
+                    {
+                        return;
+                    }
+            }
         }
     }
 
@@ -68,7 +76,7 @@ public class MyLibrary(IPrompter prompter, IStorage storage) : IMenuAction
 
     private void AskBookDetails(IReadOnlyList<Book> books)
     {
-        var selectedId = prompter.AskInt("\nEnter book's ID: ", isOptional: true);
+        var selectedId = prompter.AskInt("Enter book's ID (press Enter to cancel): ", isOptional: true);
         if (selectedId is not int bookId)
         {
             return;
@@ -82,8 +90,45 @@ public class MyLibrary(IPrompter prompter, IStorage storage) : IMenuAction
         }
 
         var foundBook = books[bookIndex];
+        PrintBookDetails(foundBook);
+    }
 
-        //TODO: Make the output prettier
-        Console.WriteLine(foundBook);
+    private static void PrintBookDetails(Book book)
+    {
+        Console.WriteLine("\n========== BOOK DETAILS ==========");
+
+        PrintField("Title", book.Title);
+        PrintField("Author", book.Author);
+
+        if (book.PublicationYear is not null)
+        {
+            PrintField("Publication year", book.PublicationYear);
+        }
+
+        PrintField("Status", book.Status);
+
+        if (book.Rating is not null)
+        {
+            PrintField("Rating", book.Rating);
+        }
+
+        if (book.TotalPages > 0)
+        {
+            PrintField(
+                "Pages",
+                $"{book.CurrentPage} / {book.TotalPages} ({book.CompletionRate}%)"
+            );
+        }
+        else
+        {
+            PrintField("Current page", book.CurrentPage);
+        }
+
+        Console.WriteLine("==================================");
+    }
+
+    private static void PrintField(string label, object? value)
+    {
+        Console.WriteLine($"{label + ":",-20} {value}");
     }
 }
