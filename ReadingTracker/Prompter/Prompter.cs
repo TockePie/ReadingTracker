@@ -71,7 +71,7 @@ public class Prompter : IPrompter
                 return validated;
             }
 
-            if (string.IsNullOrWhiteSpace(errorMessage))
+            if (!string.IsNullOrWhiteSpace(errorMessage))
             {
                 Console.WriteLine(errorMessage);
             }

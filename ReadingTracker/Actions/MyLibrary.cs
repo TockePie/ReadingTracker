@@ -8,11 +8,11 @@ public class MyLibrary(IPrompter prompter, IStorage storage) : IMenuAction
 {
     public string Description => "My library";
 
-    public void Execute()
+    public async Task ExecuteAsync()
     {
         Console.WriteLine("\n========== MY LIBRARY ==========");
 
-        var savedBooks = storage.Get<Book>().GetAwaiter().GetResult();
+        var savedBooks = await storage.Get<Book>();
         if (savedBooks is not { Count: > 0 })
         {
             Console.WriteLine("\nYour library is empty");
@@ -156,9 +156,9 @@ public class MyLibrary(IPrompter prompter, IStorage storage) : IMenuAction
         Console.WriteLine($"{label + ":",-20} {value}");
     }
 
-    private void RemoveBook(Book book)
+    private async Task RemoveBook(Book book)
     {
-        storage.RemoveById<Book>(book.Id).GetAwaiter().GetResult();
+        await storage.RemoveById<Book>(book.Id);
 
         Console.WriteLine("Book removed successfully.");
     }

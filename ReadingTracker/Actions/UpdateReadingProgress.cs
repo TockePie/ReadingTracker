@@ -8,12 +8,13 @@ public class UpdateReadingProgress(IPrompter prompter, IStorage storage) : IMenu
 {
     public string Description => "Update reading progress";
 
-    public void Execute()
+    public async Task ExecuteAsync()
     {
         Console.WriteLine("\n========== UPDATE READING PROGRESS ==========");
 
-        var savedBooks = storage.Get<Book>().GetAwaiter().GetResult();
-        if (savedBooks is not { Count: > 0 })
+        var allBooks = await storage.Get<Book>();
+        //TODO: Filter here books only with status "Reading"
+        if (allBooks is not { Count: > 0 })
         {
             Console.WriteLine("\nYour library is empty");
             return;
@@ -21,23 +22,22 @@ public class UpdateReadingProgress(IPrompter prompter, IStorage storage) : IMenu
 
         Console.WriteLine("\nYour books currently being read:\n");
 
-        for (int i = 0; i < savedBooks.Count; i++)
+        for (int i = 0; i < allBooks.Count; i++)
         {
-            var progressSuffix = savedBooks[i].TotalPages > 0
-                ? $"/{savedBooks[i].TotalPages} pages ({savedBooks[i].CompletionRate}%)"
+            var progressSuffix = allBooks[i].TotalPages > 0
+                ? $"/{allBooks[i].TotalPages} pages ({allBooks[i].CompletionRate}%)"
                 : " pages";
 
-            Console.WriteLine($"{i + 1}. {savedBooks[i].Title} - {savedBooks[i].CurrentPage}{progressSuffix}");
+            Console.WriteLine($"{i + 1}. {allBooks[i].Title} - {allBooks[i].CurrentPage}{progressSuffix}");
         }
 
-        var isValid = TryPromptBookDetails(savedBooks, out var selectedBook);
+        var isValid = TryPromptBookDetails(allBooks, out var selectedBook);
         if (!isValid)
         {
             return;
         }
 
         var maxPages = selectedBook.TotalPages ?? int.MaxValue;
-
         var enteredPage = prompter.AskInt(
             "Enter your current page: ",
             input => input > 0 && input <= maxPages
@@ -45,7 +45,7 @@ public class UpdateReadingProgress(IPrompter prompter, IStorage storage) : IMenu
 
         var updatedBook = selectedBook with { CurrentPage = enteredPage };
 
-        storage.UpdateItem(selectedBook.Id, updatedBook).GetAwaiter().GetResult();
+        await storage.UpdateItem(selectedBook.Id, updatedBook);
 
         Console.WriteLine("\nProgress updated successfully!");
 

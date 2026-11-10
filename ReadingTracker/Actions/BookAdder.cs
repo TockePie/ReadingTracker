@@ -6,38 +6,39 @@ namespace ReadingTracker.Actions;
 
 public class BookAdder(IPrompter prompter, IStorage storage) : IMenuAction
 {
-    private readonly IPrompter _prompter = prompter;
-    private readonly IStorage _storage = storage;
-
     public string Description => "Add a book manually";
 
-    public void Execute()
+    public async Task ExecuteAsync()
     {
         Console.WriteLine("========== ADD BOOK MANUALLY ==========");
 
-        var title = _prompter.Ask("Title: ");
-        var author = _prompter.Ask("Author: ");
-        var publicationYear = _prompter.AskInt(
+        var title = prompter.Ask("Title: ");
+        var author = prompter.Ask("Author: ");
+
+        var currentYear = DateTime.Now.Year;
+        var publicationYear = prompter.AskInt(
             "Publication year: ",
             isOptional: true,
-            input => input is > 0 and <= 2026
+            input => input > 0 && input <= currentYear
         );
-        var totalPages = _prompter.AskInt(
+
+        var totalPages = prompter.AskInt(
             "Total pages: ",
             isOptional: true,
             input => input is > 0
         );
 
-        var selectedReadingStatus = _prompter.AskInt(@"
+        var selectedReadingStatus = prompter.AskInt(@"
 Reading status:
 1. Want to Read
 2. Reading
 3. Completed
 Select status:",
             input => input is >= 1 and < 4
-        ) - 1;
+        );
+        var readingStatus = selectedReadingStatus - 1;
 
-        var rating = _prompter.AskInt(
+        var rating = prompter.AskInt(
             "\nYour rating (0-5, or skip):",
             isOptional: true,
             input => input is >= 0 and <= 5
@@ -48,11 +49,11 @@ Select status:",
             author,
             publicationYear,
             totalPages,
-            (ReadingStatus)selectedReadingStatus,
+            (ReadingStatus)readingStatus,
             rating
         );
 
-        _storage.Save(bookToBeAdded).GetAwaiter().GetResult();
+        await storage.Save(bookToBeAdded);
 
         Console.WriteLine("\nBook added successfully!");
     }

@@ -19,11 +19,11 @@ var menuActions = new Dictionary<int, IMenuAction>
 };
 
 var runner = new Runner(menuActions, prompter);
-runner.Run();
+await runner.Run();
 
-class Runner(Dictionary<int, IMenuAction> menuActions, IPrompter prompter)
+class Runner(IReadOnlyDictionary<int, IMenuAction> menuActions, IPrompter prompter)
 {
-    public void Run()
+    public async Task Run()
     {
         while (true)
         {
@@ -32,10 +32,10 @@ class Runner(Dictionary<int, IMenuAction> menuActions, IPrompter prompter)
             var selectedOption = prompter.AskInt(
                 "Select an option: ",
                 menuActions.ContainsKey,
-                "Select an option between 0 and 8"
+                errorMessage: "Select an option between 0 and 8"
             );
 
-            menuActions[selectedOption].Execute();
+            await menuActions[selectedOption].ExecuteAsync();
         }
     }
 
