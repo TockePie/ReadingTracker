@@ -1,10 +1,15 @@
+using ReadingTracker.ConsoleHelper;
 using ReadingTracker.Models;
 using ReadingTracker.Prompter;
 using ReadingTracker.Storage;
 
 namespace ReadingTracker.Actions;
 
-public class MyLibrary(IPrompter prompter, IStorage storage) : IMenuAction
+public class MyLibrary(
+    IPrompter prompter,
+    IStorage storage,
+    IConsoleHelper consoleHelper
+) : IMenuAction
 {
     public string Description => "My library";
 
@@ -40,7 +45,7 @@ public class MyLibrary(IPrompter prompter, IStorage storage) : IMenuAction
             {
                 case 1:
                     {
-                        var isValid = TryPromptBookDetails(savedBooks, out var selectedBook);
+                        var isValid = consoleHelper.TryPromptBookDetails(savedBooks, out var selectedBook);
                         if (isValid)
                         {
                             PrintBookDetails(selectedBook);
@@ -59,7 +64,7 @@ public class MyLibrary(IPrompter prompter, IStorage storage) : IMenuAction
 
                 case 3:
                     {
-                        var isValid = TryPromptBookDetails(savedBooks, out var selectedBook);
+                        var isValid = consoleHelper.TryPromptBookDetails(savedBooks, out var selectedBook);
                         if (isValid)
                         {
                             RemoveBook(selectedBook);
@@ -82,78 +87,43 @@ public class MyLibrary(IPrompter prompter, IStorage storage) : IMenuAction
             var book = books[i];
             var displayNumber = i + 1;
 
-            var progressSuffix = book.TotalPages > 0
-                ? $"/{book.TotalPages} ({book.CompletionRate}%)"
-                : string.Empty;
-
             Console.WriteLine($"\nID: {displayNumber} | {book.Title} - {book.Author}");
-            Console.WriteLine($"\tStatus: {book.Status} | Progress: {book.CurrentPage}{progressSuffix}");
+            Console.WriteLine($"\tStatus: {book.Status} | Progress: {book.DisplayProgress}");
         }
     }
 
-    private bool TryPromptBookDetails(IReadOnlyList<Book> books, out Book? book)
-    {
-        var enteredNumber = prompter.AskInt(
-            "Enter book's ID (press Enter to cancel): ",
-            isOptional: true
-        );
-        if (enteredNumber is not int displayNumber)
-        {
-            book = null;
-            return false;
-        }
-
-        var bookIndex = displayNumber - 1;
-        if (bookIndex < 0 || bookIndex >= books.Count)
-        {
-            Console.WriteLine($"\nNo book found with ID: {displayNumber}");
-
-            book = null;
-            return false;
-        }
-
-        book = books[bookIndex];
-        return true;
-    }
-
-    private static void PrintBookDetails(Book book)
+    private void PrintBookDetails(Book book)
     {
         Console.WriteLine("\n========== BOOK DETAILS ==========");
 
-        PrintField("Title", book.Title);
-        PrintField("Author", book.Author);
+        consoleHelper.PrintField("Title", book.Title);
+        consoleHelper.PrintField("Author", book.Author);
 
         if (book.PublicationYear is not null)
         {
-            PrintField("Publication year", book.PublicationYear);
+            consoleHelper.PrintField("Publication year", book.PublicationYear);
         }
 
-        PrintField("Status", book.Status);
+        consoleHelper.PrintField("Status", book.Status);
 
         if (book.Rating is not null)
         {
-            PrintField("Rating", book.Rating);
+            consoleHelper.PrintField("Rating", book.Rating);
         }
 
         if (book.TotalPages > 0)
         {
-            PrintField(
+            consoleHelper.PrintField(
                 "Pages",
                 $"{book.CurrentPage} / {book.TotalPages} ({book.CompletionRate}%)"
             );
         }
         else
         {
-            PrintField("Current page", book.CurrentPage);
+            consoleHelper.PrintField("Current page", book.CurrentPage);
         }
 
         Console.WriteLine("==================================");
-    }
-
-    //TODO: move this method to a dedicated class
-    private static void PrintField(string label, object? value)
-    {
-        Console.WriteLine($"{label + ":",-20} {value}");
     }
 
     private async Task RemoveBook(Book book)

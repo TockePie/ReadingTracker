@@ -33,4 +33,8 @@ public record Book(
     public double? CompletionRate => TotalPages > 0
         ? Math.Round((double)CurrentPage / TotalPages.Value * 100, 1)
         : null;
+
+    public string DisplayProgress => TotalPages > 0
+        ? $"{CurrentPage}/{TotalPages} pages ({CompletionRate}%)"
+        : $"{CurrentPage} pages";
 }

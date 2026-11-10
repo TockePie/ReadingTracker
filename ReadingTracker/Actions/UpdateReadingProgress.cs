@@ -1,10 +1,15 @@
+using ReadingTracker.ConsoleHelper;
 using ReadingTracker.Models;
 using ReadingTracker.Prompter;
 using ReadingTracker.Storage;
 
 namespace ReadingTracker.Actions;
 
-public class UpdateReadingProgress(IPrompter prompter, IStorage storage) : IMenuAction
+public class UpdateReadingProgress(
+    IPrompter prompter,
+    IStorage storage,
+    IConsoleHelper consoleHelper
+) : IMenuAction
 {
     public string Description => "Update reading progress";
 
@@ -24,14 +29,13 @@ public class UpdateReadingProgress(IPrompter prompter, IStorage storage) : IMenu
 
         for (int i = 0; i < allBooks.Count; i++)
         {
-            var progressSuffix = allBooks[i].TotalPages > 0
-                ? $"/{allBooks[i].TotalPages} pages ({allBooks[i].CompletionRate}%)"
-                : " pages";
+            var book = allBooks[i];
+            var displayNumber = i + 1;
 
-            Console.WriteLine($"{i + 1}. {allBooks[i].Title} - {allBooks[i].CurrentPage}{progressSuffix}");
+            Console.WriteLine($"{displayNumber}. {book.Title} - {book.DisplayProgress}");
         }
 
-        var isValid = TryPromptBookDetails(allBooks, out var selectedBook);
+        var isValid = consoleHelper.TryPromptBookDetails(allBooks, out var selectedBook);
         if (!isValid)
         {
             return;
@@ -48,36 +52,6 @@ public class UpdateReadingProgress(IPrompter prompter, IStorage storage) : IMenu
         await storage.UpdateItem(selectedBook.Id, updatedBook);
 
         Console.WriteLine("\nProgress updated successfully!");
-
-        var newProgressSuffix = updatedBook.TotalPages > 0
-            ? $"/{updatedBook.TotalPages} ({updatedBook.CompletionRate}%)"
-            : string.Empty;
-
-        Console.WriteLine($"New progress: {updatedBook.CurrentPage}{newProgressSuffix}");
-    }
-
-    private bool TryPromptBookDetails(IReadOnlyList<Book> books, out Book? book)
-    {
-        var enteredNumber = prompter.AskInt(
-            "\nSelect a book: ",
-            isOptional: true
-        );
-        if (enteredNumber is not int displayNumber)
-        {
-            book = null;
-            return false;
-        }
-
-        var bookIndex = displayNumber - 1;
-        if (bookIndex < 0 || bookIndex >= books.Count)
-        {
-            Console.WriteLine($"\nNo book found with ID: {displayNumber}");
-
-            book = null;
-            return false;
-        }
-
-        book = books[bookIndex];
-        return true;
+        Console.WriteLine($"New progress: {updatedBook.DisplayProgress}");
     }
 }

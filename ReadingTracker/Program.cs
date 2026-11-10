@@ -1,16 +1,18 @@
 ﻿using ReadingTracker.Actions;
+using ReadingTracker.ConsoleHelper;
 using ReadingTracker.Prompter;
 using ReadingTracker.Storage;
 
 var prompter = new Prompter();
 var jsonStorage = new JsonStorage("books.json");
+var consoleHelper = new ConsoleHelper(prompter);
 
 var menuActions = new Dictionary<int, IMenuAction>
 {
-    { 1, new MyLibrary(prompter, jsonStorage) },
+    { 1, new MyLibrary(prompter, jsonStorage, consoleHelper) },
     { 2, new NotImplementedMenuAction("Search books online") },
     { 3, new BookAdder(prompter, jsonStorage) },
-    { 4, new UpdateReadingProgress(prompter, jsonStorage) },
+    { 4, new UpdateReadingProgress(prompter, jsonStorage, consoleHelper) },
     { 5, new NotImplementedMenuAction("Change reading status") },
     { 6, new NotImplementedMenuAction("Search and filter my books") },
     { 7, new NotImplementedMenuAction("Reading statistics") },
