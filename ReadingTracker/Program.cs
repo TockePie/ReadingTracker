@@ -13,7 +13,7 @@ var menuActions = new Dictionary<int, IMenuAction>
     { 2, new NotImplementedMenuAction("Search books online") },
     { 3, new BookAdder(prompter, jsonStorage) },
     { 4, new UpdateReadingProgress(prompter, jsonStorage, consoleHelper) },
-    { 5, new NotImplementedMenuAction("Change reading status") },
+    { 5, new ChangeReadingStatus(prompter, jsonStorage, consoleHelper) },
     { 6, new NotImplementedMenuAction("Search and filter my books") },
     { 7, new NotImplementedMenuAction("Reading statistics") },
     { 8, new NotImplementedMenuAction("Export library") },
