@@ -21,7 +21,9 @@ public class ChangeReadingStatus(
         var allBooks = await storage.Get<Book>();
         if (allBooks is not { Count: > 0 })
         {
-            Console.WriteLine("\nYour library is empty");
+            Console.WriteLine("Your library is empty");
+
+            consoleHelper.PressToContinue();
             return;
         }
 

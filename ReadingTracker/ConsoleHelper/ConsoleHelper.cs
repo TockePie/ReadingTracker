@@ -39,4 +39,10 @@ public class ConsoleHelper(IPrompter prompter) : IConsoleHelper
         book = books[bookIndex];
         return true;
     }
+
+    public void PressToContinue()
+    {
+        Console.WriteLine("Press any key to continue...\n");
+        Console.ReadKey();
+    }
 }

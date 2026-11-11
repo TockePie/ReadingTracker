@@ -33,18 +33,21 @@ public class BookAdder(
             input => input is > 0
         );
 
-        var selectedReadingStatus = prompter.AskInt(@"
-Reading status:
-1. Want to Read
-2. Reading
-3. Completed
-Select status:",
+        var selectedReadingStatus = prompter.AskInt(
+            """
+            Reading status:
+            1. Want to Read
+            2. Reading
+            3. Completed
+            Select status:
+
+            """,
             input => input is >= 1 and < 4
         );
         var readingStatus = selectedReadingStatus - 1;
 
         var rating = prompter.AskInt(
-            "\nYour rating (0-5, or skip):",
+            "Your rating (0-5, or skip): ",
             isOptional: true,
             input => input is >= 0 and <= 5
         );
@@ -61,5 +64,7 @@ Select status:",
         await storage.Save(bookToBeAdded);
 
         Console.WriteLine("\nBook added successfully!");
+
+        consoleHelper.PressToContinue();
     }
 }

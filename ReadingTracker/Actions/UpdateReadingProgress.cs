@@ -21,7 +21,9 @@ public class UpdateReadingProgress(
         //TODO: Filter here books only with status "Reading"
         if (allBooks is not { Count: > 0 })
         {
-            Console.WriteLine("\nYour library is empty");
+            Console.WriteLine("Your library is empty");
+
+            consoleHelper.PressToContinue();
             return;
         }
 
@@ -48,10 +50,11 @@ public class UpdateReadingProgress(
         );
 
         var updatedBook = selectedBook with { CurrentPage = enteredPage };
-
         await storage.UpdateItem(selectedBook.Id, updatedBook);
 
         Console.WriteLine("\nProgress updated successfully!");
         Console.WriteLine($"New progress: {updatedBook.DisplayProgress}");
+
+        consoleHelper.PressToContinue();
     }
 }
