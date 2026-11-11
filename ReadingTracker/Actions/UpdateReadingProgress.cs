@@ -15,7 +15,7 @@ public class UpdateReadingProgress(
 
     public async Task ExecuteAsync()
     {
-        Console.WriteLine("\n========== UPDATE READING PROGRESS ==========");
+        consoleHelper.PrintHeader(Description);
 
         var allBooks = await storage.Get<Book>();
         //TODO: Filter here books only with status "Reading"

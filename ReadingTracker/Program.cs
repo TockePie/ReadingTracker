@@ -11,7 +11,7 @@ var menuActions = new Dictionary<int, IMenuAction>
 {
     { 1, new MyLibrary(prompter, jsonStorage, consoleHelper) },
     { 2, new NotImplementedMenuAction("Search books online") },
-    { 3, new BookAdder(prompter, jsonStorage) },
+    { 3, new BookAdder(prompter, jsonStorage, consoleHelper) },
     { 4, new UpdateReadingProgress(prompter, jsonStorage, consoleHelper) },
     { 5, new ChangeReadingStatus(prompter, jsonStorage, consoleHelper) },
     { 6, new NotImplementedMenuAction("Search and filter my books") },
@@ -43,11 +43,14 @@ class Runner(IReadOnlyDictionary<int, IMenuAction> menuActions, IPrompter prompt
 
     private void DisplayEntryMessage()
     {
-        Console.WriteLine(@"
-================================
-     PERSONAL READING TRACKER
-================================
-");
+        Console.WriteLine(
+            """
+            ================================
+                PERSONAL READING TRACKER
+            ================================
+            
+            """
+        );
 
         var sortedActions = menuActions
             .OrderBy(action => action.Key == 0 ? 1 : 0)

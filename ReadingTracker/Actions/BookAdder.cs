@@ -1,16 +1,21 @@
+using ReadingTracker.ConsoleHelper;
 using ReadingTracker.Models;
 using ReadingTracker.Prompter;
 using ReadingTracker.Storage;
 
 namespace ReadingTracker.Actions;
 
-public class BookAdder(IPrompter prompter, IStorage storage) : IMenuAction
+public class BookAdder(
+    IPrompter prompter,
+    IStorage storage,
+    IConsoleHelper consoleHelper
+) : IMenuAction
 {
     public string Description => "Add a book manually";
 
     public async Task ExecuteAsync()
     {
-        Console.WriteLine("========== ADD BOOK MANUALLY ==========");
+        consoleHelper.PrintHeader(Description);
 
         var title = prompter.Ask("Title: ");
         var author = prompter.Ask("Author: ");

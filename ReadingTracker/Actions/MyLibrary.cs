@@ -15,12 +15,12 @@ public class MyLibrary(
 
     public async Task ExecuteAsync()
     {
-        Console.WriteLine("\n========== MY LIBRARY ==========");
+        consoleHelper.PrintHeader(Description);
 
         var savedBooks = await storage.Get<Book>();
         if (savedBooks is not { Count: > 0 })
         {
-            Console.WriteLine("\nYour library is empty");
+            Console.WriteLine("Your library is empty");
             return;
         }
 
@@ -28,7 +28,7 @@ public class MyLibrary(
 
         while (true)
         {
-            Console.WriteLine("\n--------------------------------");
+            Console.WriteLine("--------------------------------");
             Console.WriteLine(@"
 1. View book details
 2. Edit book information
@@ -51,7 +51,7 @@ public class MyLibrary(
                             PrintBookDetails(selectedBook);
                         }
 
-                        Console.WriteLine("\nPress any key to continue...");
+                        Console.WriteLine("\nPress any key to continue...\n");
                         Console.ReadKey(intercept: true);
                         break;
                     }
@@ -87,8 +87,8 @@ public class MyLibrary(
             var book = books[i];
             var displayNumber = i + 1;
 
-            Console.WriteLine($"\nID: {displayNumber} | {book.Title} - {book.Author}");
-            Console.WriteLine($"\tStatus: {book.Status} | Progress: {book.DisplayProgress}");
+            Console.WriteLine($"ID: {displayNumber} | {book.Title} - {book.Author}");
+            Console.WriteLine($"\tStatus: {book.Status} | Progress: {book.DisplayProgress}\n");
         }
     }
 

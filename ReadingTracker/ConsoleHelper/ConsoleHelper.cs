@@ -5,6 +5,11 @@ namespace ReadingTracker.ConsoleHelper;
 
 public class ConsoleHelper(IPrompter prompter) : IConsoleHelper
 {
+    public void PrintHeader(string label)
+    {
+        Console.WriteLine($"\n========== {label.ToUpper()} ==========\n");
+    }
+
     public void PrintField(string label, object? value)
     {
         Console.WriteLine($"{label + ":",-20} {value}");

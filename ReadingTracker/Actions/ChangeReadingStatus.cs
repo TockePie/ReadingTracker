@@ -16,7 +16,7 @@ public class ChangeReadingStatus(
 
     public async Task ExecuteAsync()
     {
-        Console.WriteLine("\n========== CHANGE READING STATUS ==========\n");
+        consoleHelper.PrintHeader(Description);
 
         var allBooks = await storage.Get<Book>();
         if (allBooks is not { Count: > 0 })
