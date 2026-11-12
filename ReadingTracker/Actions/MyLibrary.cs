@@ -33,6 +33,7 @@ public class MyLibrary(
             Console.WriteLine(
                 """
                 --------------------------------
+                
                 1. View book details
                 2. Edit book information
                 3. Remove a book

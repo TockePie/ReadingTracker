@@ -27,7 +27,7 @@ public class UpdateReadingProgress(
             return;
         }
 
-        Console.WriteLine("\nYour books currently being read:\n");
+        Console.WriteLine("Your books currently being read:\n");
 
         for (int i = 0; i < allBooks.Count; i++)
         {
@@ -37,6 +37,7 @@ public class UpdateReadingProgress(
             Console.WriteLine($"{displayNumber}. {book.Title} - {book.DisplayProgress}");
         }
 
+        Console.WriteLine();
         var isValid = consoleHelper.TryPromptBookDetails(allBooks, out var selectedBook);
         if (!isValid)
         {
@@ -53,7 +54,7 @@ public class UpdateReadingProgress(
         await storage.UpdateItem(selectedBook.Id, updatedBook);
 
         Console.WriteLine("\nProgress updated successfully!");
-        Console.WriteLine($"New progress: {updatedBook.DisplayProgress}");
+        Console.WriteLine($"New progress: {updatedBook.DisplayProgress}\n");
 
         consoleHelper.PressToContinue();
     }
