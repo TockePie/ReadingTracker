@@ -32,7 +32,7 @@ public class ReadingStatistics(
 
         Console.WriteLine();
         consoleHelper.PrintField("Total pages read", allBooks.Sum(book => book.CurrentPage));
-        consoleHelper.PrintField("Pages remaining", allBooks.Sum(book => book.TotalPages is not null ? book.TotalPages - book.CurrentPage : 0));
+        consoleHelper.PrintField("Pages remaining", allBooks.Sum(book => (book.TotalPages - book.CurrentPage) ?? 0));
 
         var averageRating = CalculateAverageRating(allBooks);
         if (averageRating is not null)
@@ -57,7 +57,12 @@ public class ReadingStatistics(
             .OrderByDescending(x => x.Count)
             .FirstOrDefault();
 
-        return (mostAuthor.Author, mostAuthor.Count);
+        if (mostAuthor is not null)
+        {
+            return (mostAuthor.Author, mostAuthor.Count);
+        }
+
+        return ("Unknown", 0);
     }
 
     private decimal? CalculateAverageRating(IReadOnlyList<Book> books)
