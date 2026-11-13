@@ -15,7 +15,7 @@ var menuActions = new Dictionary<int, IMenuAction>
     { 4, new UpdateReadingProgress(prompter, jsonStorage, consoleHelper) },
     { 5, new ChangeReadingStatus(prompter, jsonStorage, consoleHelper) },
     { 6, new SearchAndFilterBooks(prompter, jsonStorage, consoleHelper)},
-    { 7, new NotImplementedMenuAction("Reading statistics") },
+    { 7, new ReadingStatistics(jsonStorage, consoleHelper) },
     { 8, new NotImplementedMenuAction("Export library") },
     { 0, new ExitAction() }
 };
