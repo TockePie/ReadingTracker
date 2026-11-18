@@ -3,31 +3,18 @@ using System.Text;
 
 namespace ReadingTracker.Storage;
 
-public class CsvStorage : IStorage
+public class CsvStorage(string filePath) : ICsvStorage
 {
     private static readonly char[] SpecialCharacters = [',', '"', '\r', '\n'];
 
-    public Task<List<T>> Get<T>() where T : IEntity
+    public void Save<T>(IEnumerable<T> content) where T : IEntity
     {
-        throw new NotImplementedException();
+        var result = BuildString(content);
+
+        File.WriteAllText(filePath, result, new UTF8Encoding(false));
     }
 
-    public Task RemoveById<T>(Guid id) where T : IEntity
-    {
-        throw new NotImplementedException();
-    }
-
-    public Task Save<T>(T content) where T : IEntity
-    {
-        throw new NotImplementedException();
-    }
-
-    public Task UpdateItem<T>(Guid id, T content) where T : IEntity
-    {
-        throw new NotImplementedException();
-    }
-
-    private static string BuildCsvString<T>(IEnumerable<T> content) where T : IEntity
+    private static string BuildString<T>(IEnumerable<T> content) where T : IEntity
     {
         var stringBuilder = new StringBuilder();
 
@@ -36,19 +23,19 @@ public class CsvStorage : IStorage
             .Where(property => property.GetIndexParameters().Length == 0)
             .ToArray();
 
-        var keys = properties.Select(obj => obj.Name).ToArray();
+        var keys = properties.Select(obj => EscapeChar(obj.Name)).ToArray();
         var stringKeys = string.Join(',', keys);
 
-        stringBuilder.AppendLine(EscapeChar(stringKeys));
+        stringBuilder.AppendLine(stringKeys);
 
         foreach (var item in content)
         {
             var values = properties
-                .Select(obj => obj.GetValue(item)?.ToString() ?? string.Empty)
+                .Select(obj => EscapeChar(obj.GetValue(item)?.ToString() ?? string.Empty))
                 .ToArray();
 
             var stringValues = string.Join(',', values);
-            stringBuilder.AppendLine(EscapeChar(stringValues));
+            stringBuilder.AppendLine(stringValues);
         }
 
         return stringBuilder.ToString();
