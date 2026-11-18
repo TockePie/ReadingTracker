@@ -5,6 +5,7 @@ using ReadingTracker.Storage;
 
 var prompter = new Prompter();
 var jsonStorage = new JsonStorage("books.json");
+var csvStorage = new CsvStorage("books.csv");
 var consoleHelper = new ConsoleHelper(prompter);
 
 var menuActions = new Dictionary<int, IMenuAction>
@@ -16,7 +17,7 @@ var menuActions = new Dictionary<int, IMenuAction>
     { 5, new ChangeReadingStatus(prompter, jsonStorage, consoleHelper) },
     { 6, new SearchAndFilterBooks(prompter, jsonStorage, consoleHelper)},
     { 7, new ReadingStatistics(jsonStorage, consoleHelper) },
-    { 8, new NotImplementedMenuAction("Export library") },
+    { 8, new ExportLibrary(prompter, jsonStorage, csvStorage, consoleHelper) },
     { 0, new ExitAction() }
 };
 
