@@ -11,7 +11,7 @@ var consoleHelper = new ConsoleHelper(prompter);
 var menuActions = new Dictionary<int, IMenuAction>
 {
     { 1, new MyLibrary(prompter, jsonStorage, consoleHelper) },
-    { 2, new NotImplementedMenuAction("Search books online") },
+    { 2, new SearchOnline(new HttpClient(), prompter, jsonStorage, consoleHelper) },
     { 3, new BookAdder(prompter, jsonStorage, consoleHelper) },
     { 4, new UpdateReadingProgress(prompter, jsonStorage, consoleHelper) },
     { 5, new ChangeReadingStatus(prompter, jsonStorage, consoleHelper) },
