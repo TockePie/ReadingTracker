@@ -11,7 +11,7 @@ public class JsonStorage(string filePath) : IStorage
         WriteIndented = true
     };
 
-    public async Task<List<T>> Get<T>()
+    public async Task<List<T>> Get<T>() where T : IEntity
     {
         List<T> parsedList = [];
 
@@ -24,7 +24,7 @@ public class JsonStorage(string filePath) : IStorage
         return parsedList;
     }
 
-    public async Task Save<T>(T content)
+    public async Task Save<T>(T content) where T : IEntity
     {
         var parsedList = await Get<T>();
 
