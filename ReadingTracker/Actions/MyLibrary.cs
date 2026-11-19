@@ -90,10 +90,9 @@ public class MyLibrary(
 
     private static void DisplayBooks(IReadOnlyList<Book> books)
     {
-        for (int i = 0; i < books.Count; i++)
+        foreach (var (index, book) in books.Index())
         {
-            var book = books[i];
-            var displayNumber = i + 1;
+            var displayNumber = index + 1;
 
             Console.WriteLine($"ID: {displayNumber} | {book.Title} - {book.Author}");
             Console.WriteLine($"\tStatus: {book.Status} | Progress: {book.DisplayProgress}\n");
@@ -104,19 +103,35 @@ public class MyLibrary(
     {
         Console.WriteLine("\n========== BOOK DETAILS ==========");
 
-        consoleHelper.PrintField("Title", book.Title);
-        consoleHelper.PrintField("Author", book.Author);
+        consoleHelper.PrintField(
+            "Title",
+            book.Title
+        );
+
+        consoleHelper.PrintField(
+            "Author",
+            book.Author
+        );
 
         if (book.PublicationYear is not null)
         {
-            consoleHelper.PrintField("Publication year", book.PublicationYear);
+            consoleHelper.PrintField(
+                "Publication year",
+                book.PublicationYear
+            );
         }
 
-        consoleHelper.PrintField("Status", book.Status);
+        consoleHelper.PrintField(
+            "Status",
+            book.Status
+        );
 
         if (book.Rating is not null)
         {
-            consoleHelper.PrintField("Rating", book.Rating);
+            consoleHelper.PrintField(
+                "Rating",
+                book.Rating
+            );
         }
 
         if (book.TotalPages > 0)
@@ -128,7 +143,10 @@ public class MyLibrary(
         }
         else
         {
-            consoleHelper.PrintField("Current page", book.CurrentPage);
+            consoleHelper.PrintField(
+                "Current page",
+                book.CurrentPage
+            );
         }
 
         Console.WriteLine("==================================\n");

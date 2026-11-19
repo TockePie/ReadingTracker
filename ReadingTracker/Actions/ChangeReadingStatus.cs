@@ -56,19 +56,22 @@ public class ChangeReadingStatus(
         }
 
         var newStatus = (ReadingStatus)(selectedReadingStatus - 1);
-        if (newStatus == selectedBook.Status)
+        await UpdateBookStatusAsync(selectedBook, newStatus);
+
+        consoleHelper.PressToContinue();
+    }
+
+    private async Task UpdateBookStatusAsync(Book book, ReadingStatus newStatus)
+    {
+        if (newStatus == book.Status)
         {
             Console.WriteLine("\nStatus is already set to this value. No changes made.");
-
-            consoleHelper.PressToContinue();
             return;
         }
 
-        var updatedBook = selectedBook with { Status = newStatus };
-        await storage.UpdateItem(selectedBook.Id, updatedBook);
+        var updatedBook = book with { Status = newStatus };
+        await storage.UpdateItem(book.Id, updatedBook);
 
         Console.WriteLine("\nStatus changed successfully!");
-
-        consoleHelper.PressToContinue();
     }
 }

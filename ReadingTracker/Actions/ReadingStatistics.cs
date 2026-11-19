@@ -25,27 +25,57 @@ public class ReadingStatistics(
             return;
         }
 
-        consoleHelper.PrintField("Total books", allBooks.Count);
-        consoleHelper.PrintField("Want to Read", allBooks.Count(book => book.Status == ReadingStatus.WantToRead));
-        consoleHelper.PrintField("Currently reading", allBooks.Count(book => book.Status == ReadingStatus.Reading));
-        consoleHelper.PrintField("Completed", allBooks.Count(book => book.Status == ReadingStatus.Completed));
-
-        Console.WriteLine();
-        consoleHelper.PrintField("Total pages read", allBooks.Sum(book => book.CurrentPage));
-        consoleHelper.PrintField("Pages remaining", allBooks.Sum(book => (book.TotalPages - book.CurrentPage) ?? 0));
-
-        var averageRating = CalculateAverageRating(allBooks);
-        if (averageRating is not null)
-        {
-            consoleHelper.PrintField("Average rating", averageRating);
-        }
-
-        Console.WriteLine();
-        Console.WriteLine("Most read author:");
-        var (Author, Count) = CalculateMostReadAuthor(allBooks);
-        Console.WriteLine($"{Author} - {Count} books completed");
+        PrintStatistics(allBooks);
 
         consoleHelper.PressToContinue();
+    }
+
+    private void PrintStatistics(IReadOnlyList<Book> books)
+    {
+        consoleHelper.PrintField(
+            "Total books",
+            books.Count
+        );
+
+        consoleHelper.PrintField(
+            "Want to Read",
+            books.Count(book => book.Status == ReadingStatus.WantToRead)
+        );
+
+        consoleHelper.PrintField(
+            "Currently reading",
+            books.Count(book => book.Status == ReadingStatus.Reading)
+        );
+
+        consoleHelper.PrintField(
+            "Completed",
+            books.Count(book => book.Status == ReadingStatus.Completed)
+        );
+        Console.WriteLine();
+
+        consoleHelper.PrintField(
+            "Total pages read",
+            books.Sum(book => book.CurrentPage)
+        );
+
+        consoleHelper.PrintField(
+            "Pages remaining",
+            books.Sum(book => (book.TotalPages - book.CurrentPage) ?? 0)
+        );
+
+        var averageRating = CalculateAverageRating(books);
+        if (averageRating is not null)
+        {
+            consoleHelper.PrintField(
+                "Average rating",
+                averageRating
+            );
+        }
+        Console.WriteLine();
+
+        Console.WriteLine("Most read author:");
+        var (Author, Count) = CalculateMostReadAuthor(books);
+        Console.WriteLine($"{Author} - {Count} books completed");
     }
 
     private (string, int) CalculateMostReadAuthor(IReadOnlyList<Book> books)

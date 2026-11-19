@@ -42,13 +42,11 @@ public class SearchAndFilterBooks(
             input => input is >= 0 and < 8
         );
 
-        if (selectedOption == 0)
-        {
-            return;
-        }
-
         switch (selectedOption)
         {
+            case 0:
+                return;
+
             case 1:
                 SearchByString(
                     allBooks,

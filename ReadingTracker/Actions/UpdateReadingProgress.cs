@@ -28,16 +28,9 @@ public class UpdateReadingProgress(
         }
 
         Console.WriteLine("Your books currently being read:\n");
-
-        for (int i = 0; i < allBooks.Count; i++)
-        {
-            var book = allBooks[i];
-            var displayNumber = i + 1;
-
-            Console.WriteLine($"{displayNumber}. {book.Title} - {book.DisplayProgress}");
-        }
-
+        DisplayBooks(allBooks);
         Console.WriteLine();
+
         var isValid = consoleHelper.TryPromptBookDetails(allBooks, out var selectedBook);
         if (!isValid)
         {
@@ -49,13 +42,32 @@ public class UpdateReadingProgress(
             "Enter your current page: ",
             input => input > 0 && input <= maxPages
         );
+        await UpdateBookCurrentPageAsync(selectedBook, enteredPage);
 
-        var updatedBook = selectedBook with { CurrentPage = enteredPage };
-        await storage.UpdateItem(selectedBook.Id, updatedBook);
+        consoleHelper.PressToContinue();
+    }
+
+    private void DisplayBooks(IReadOnlyList<Book> books)
+    {
+        foreach (var (index, book) in books.Index())
+        {
+            var displayNumber = index + 1;
+            Console.WriteLine($"{displayNumber}. {book.Title} - {book.DisplayProgress}");
+        }
+    }
+
+    private async Task UpdateBookCurrentPageAsync(Book book, int enteredPage)
+    {
+        if (enteredPage == book.CurrentPage)
+        {
+            Console.WriteLine("\nNo changes made.");
+            return;
+        }
+
+        var updatedBook = book with { CurrentPage = enteredPage };
+        await storage.UpdateItem(book.Id, updatedBook);
 
         Console.WriteLine("\nProgress updated successfully!");
         Console.WriteLine($"New progress: {updatedBook.DisplayProgress}\n");
-
-        consoleHelper.PressToContinue();
     }
 }
