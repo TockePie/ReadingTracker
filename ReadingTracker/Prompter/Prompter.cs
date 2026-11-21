@@ -9,6 +9,12 @@ public class Prompter : IPrompter
         return Console.ReadLine()?.Trim() ?? string.Empty;
     }
 
+    public string Ask(string label, string defaultValue)
+    {
+        var input = Ask($"{label} [{defaultValue}]: ");
+        return input == string.Empty ? defaultValue : input;
+    }
+
     public int AskInt(string message)
     {
         return GetInt(message, isOptional: false, condition: null, errorMessage: null)!.Value;
@@ -47,6 +53,18 @@ public class Prompter : IPrompter
     public int? AskInt(string message, bool isOptional, Func<int, bool> condition, string errorMessage)
     {
         return GetInt(message, isOptional, condition, errorMessage);
+    }
+
+    public int? AskInt(
+        string label,
+        int? defaultValue,
+        Func<int, bool>? condition = null,
+        string? errorMessage = null
+    )
+    {
+        var display = defaultValue?.ToString() ?? "No info";
+        var input = AskInt($"{label} [{display}]: ", isOptional: true, condition, errorMessage);
+        return input ?? defaultValue;
     }
 
     private int? GetInt(

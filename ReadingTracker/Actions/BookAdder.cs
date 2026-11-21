@@ -47,9 +47,9 @@ public class BookAdder(
         var readingStatus = selectedReadingStatus - 1;
 
         var rating = prompter.AskInt(
-            "Your rating (0-5, or skip): ",
+            "Your rating (1-5, or skip): ",
             isOptional: true,
-            input => input is >= 0 and <= 5
+            input => input is > 0 and <= 5
         );
 
         var bookToBeAdded = new Book(

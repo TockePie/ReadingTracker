@@ -52,38 +52,39 @@ public class MyLibrary(
                 case 1:
                     {
                         var isValid = consoleHelper.TryPromptBookDetails(allBooks, out var selectedBook);
-                        if (isValid)
-                        {
-                            PrintBookDetails(selectedBook);
-                            consoleHelper.PressToContinue();
-                        }
+                        if (!isValid) break;
 
+                        PrintBookDetails(selectedBook);
+
+                        consoleHelper.PressToContinue();
                         break;
                     }
 
-                //TODO: Implement editing book information
                 case 2:
                     {
-                        throw new NotImplementedException();
+                        var isValid = consoleHelper.TryPromptBookDetails(allBooks, out var selectedBook);
+                        if (!isValid) break;
+
+                        await EditBookAsync(selectedBook);
+
+                        consoleHelper.PressToContinue();
+                        return;
                     }
 
                 case 3:
                     {
                         var isValid = consoleHelper.TryPromptBookDetails(allBooks, out var selectedBook);
-                        if (isValid)
-                        {
-                            await RemoveBook(selectedBook);
-                            consoleHelper.PressToContinue();
-                        }
+                        if (!isValid) break;
 
+                        await RemoveBook(selectedBook);
+
+                        consoleHelper.PressToContinue();
                         return;
                     }
 
                 case 4:
-                    {
-                        Console.WriteLine();
-                        return;
-                    }
+                    Console.WriteLine();
+                    return;
             }
         }
     }
@@ -97,6 +98,36 @@ public class MyLibrary(
             Console.WriteLine($"ID: {displayNumber} | {book.Title} - {book.Author}");
             Console.WriteLine($"\tStatus: {book.Status} | Progress: {book.DisplayProgress}\n");
         }
+    }
+
+    private async Task EditBookAsync(Book book)
+    {
+        var currentYear = DateTime.Now.Year;
+
+        var updatedBook = book with
+        {
+            Title = prompter.Ask("New title", book.Title),
+            Author = prompter.Ask("New author", book.Author),
+            PublicationYear = prompter.AskInt(
+                "New publication year",
+                book.PublicationYear,
+                input => input > 0 && input <= currentYear
+            ),
+            TotalPages = prompter.AskInt(
+                "New total pages",
+                book.TotalPages,
+                input => input > 0 && input >= book.CurrentPage,
+                "The number of total pages should be at least as many as pages you have already read."
+            ),
+            Rating = prompter.AskInt(
+                "New rating",
+                book.Rating,
+                input => input is > 0 and <= 5
+            )
+        };
+
+        await storage.UpdateItem(book.Id, updatedBook);
+        Console.WriteLine("\nBook updated successfully!");
     }
 
     private void PrintBookDetails(Book book)

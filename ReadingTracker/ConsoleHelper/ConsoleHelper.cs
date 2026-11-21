@@ -18,7 +18,7 @@ public class ConsoleHelper(IPrompter prompter) : IConsoleHelper
     public bool TryPromptBookDetails(IReadOnlyList<Book> books, out Book? book)
     {
         var enteredNumber = prompter.AskInt(
-            "Enter book's ID (press Enter to cancel): ",
+            "Enter book number (press Enter to cancel): ",
             isOptional: true
         );
         if (enteredNumber is not int displayNumber)

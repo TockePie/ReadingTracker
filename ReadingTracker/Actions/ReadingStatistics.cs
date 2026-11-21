@@ -1,6 +1,5 @@
 using ReadingTracker.ConsoleHelper;
 using ReadingTracker.Models;
-using ReadingTracker.Prompter;
 using ReadingTracker.Storage;
 
 namespace ReadingTracker.Actions;
