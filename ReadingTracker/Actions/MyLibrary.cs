@@ -1,4 +1,5 @@
 using ReadingTracker.ConsoleHelper;
+using ReadingTracker.Extensions;
 using ReadingTracker.Models;
 using ReadingTracker.Prompter;
 using ReadingTracker.Storage;
@@ -96,7 +97,7 @@ public class MyLibrary(
             var displayNumber = index + 1;
 
             Console.WriteLine($"ID: {displayNumber} | {book.Title} - {book.Author}");
-            Console.WriteLine($"\tStatus: {book.Status} | Progress: {book.DisplayProgress}\n");
+            Console.WriteLine($"\tStatus: {book.Status.GetDescription()} | Progress: {book.DisplayProgress}\n");
         }
     }
 

@@ -1,4 +1,5 @@
 using ReadingTracker.ConsoleHelper;
+using ReadingTracker.Extensions;
 using ReadingTracker.Models;
 using ReadingTracker.Prompter;
 using ReadingTracker.Storage;
@@ -155,7 +156,7 @@ public class SearchAndFilterBooks(
         foreach (var book in books)
         {
             Console.WriteLine($"- {book.Title} - {book.Author}");
-            Console.WriteLine($"  Status: {book.Status} | Progress: {book.DisplayProgress}\n");
+            Console.WriteLine($"  Status: {book.Status.GetDescription()} | Progress: {book.DisplayProgress}\n");
         }
     }
 }
