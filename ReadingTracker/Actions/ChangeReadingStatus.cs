@@ -14,7 +14,7 @@ public class ChangeReadingStatus(
 {
     public string Description => "Change reading status";
 
-    public async Task ExecuteAsync()
+    public async Task<bool> ExecuteAsync()
     {
         consoleHelper.PrintHeader(Description);
 
@@ -24,7 +24,7 @@ public class ChangeReadingStatus(
             Console.WriteLine("Your library is empty");
 
             consoleHelper.PressToContinue();
-            return;
+            return false;
         }
 
         DisplayBooks(allBooks);
@@ -33,7 +33,7 @@ public class ChangeReadingStatus(
         var isValid = consoleHelper.TryPromptBookDetails(allBooks, out var selectedBook);
         if (!isValid)
         {
-            return;
+            return false;
         }
 
         Console.WriteLine($"\nBook: {selectedBook.Title}");
@@ -55,7 +55,7 @@ public class ChangeReadingStatus(
 
         if (selectedReadingStatus == 0)
         {
-            return;
+            return false;
         }
 
         var newStatus = (ReadingStatus)(selectedReadingStatus - 1);
@@ -64,7 +64,7 @@ public class ChangeReadingStatus(
             Console.WriteLine("\nStatus is already set to this value. No changes made.");
 
             consoleHelper.PressToContinue();
-            return;
+            return false;
         }
 
         var bookToBeUpdated = selectedBook;
@@ -88,6 +88,7 @@ public class ChangeReadingStatus(
         await UpdateBookStatusAsync(bookToBeUpdated, newStatus);
 
         consoleHelper.PressToContinue();
+        return false;
     }
 
     private void DisplayBooks(IReadOnlyList<Book> books)

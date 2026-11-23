@@ -43,7 +43,12 @@ class Runner(IReadOnlyDictionary<int, IMenuAction> menuActions, IPrompter prompt
                 errorMessage: "Select an option between 0 and 8"
             );
 
-            await menuActions[selectedOption].ExecuteAsync();
+            var shouldContinue = await menuActions[selectedOption].ExecuteAsync();
+
+            if (!shouldContinue)
+            {
+                break;
+            }
         }
     }
 

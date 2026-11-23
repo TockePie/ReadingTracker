@@ -14,7 +14,7 @@ public class SearchAndFilterBooks(
 {
     public string Description => "Search and filter my books";
 
-    public async Task ExecuteAsync()
+    public async Task<bool> ExecuteAsync()
     {
         consoleHelper.PrintHeader(Description);
 
@@ -24,7 +24,7 @@ public class SearchAndFilterBooks(
             Console.WriteLine("Your library is empty");
 
             consoleHelper.PressToContinue();
-            return;
+            return false;
         }
 
         var selectedOption = prompter.AskInt(
@@ -46,7 +46,7 @@ public class SearchAndFilterBooks(
         switch (selectedOption)
         {
             case 0:
-                return;
+                return false;
 
             case 1:
                 SearchByString(
@@ -90,6 +90,7 @@ public class SearchAndFilterBooks(
         }
 
         consoleHelper.PressToContinue();
+        return false;
     }
 
     private void SearchByString(

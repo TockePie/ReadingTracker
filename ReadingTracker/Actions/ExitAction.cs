@@ -4,10 +4,8 @@ public class ExitAction : IMenuAction
 {
     public string Description => "Exit";
 
-    public Task ExecuteAsync()
+    public Task<bool> ExecuteAsync()
     {
-        Environment.Exit(0);
-
-        return Task.CompletedTask;
+        return Task.FromResult(false);
     }
 }

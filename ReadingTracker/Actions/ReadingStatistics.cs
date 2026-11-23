@@ -11,7 +11,7 @@ public class ReadingStatistics(
 {
     public string Description => "Reading statistics";
 
-    public async Task ExecuteAsync()
+    public async Task<bool> ExecuteAsync()
     {
         consoleHelper.PrintHeader(Description);
 
@@ -21,12 +21,13 @@ public class ReadingStatistics(
             Console.WriteLine("Your library is empty");
 
             consoleHelper.PressToContinue();
-            return;
+            return false;
         }
 
         PrintStatistics(allBooks);
 
         consoleHelper.PressToContinue();
+        return false;
     }
 
     private void PrintStatistics(IReadOnlyList<Book> books)

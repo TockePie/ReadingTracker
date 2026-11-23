@@ -13,7 +13,7 @@ public class BookAdder(
 {
     public string Description => "Add a book manually";
 
-    public async Task ExecuteAsync()
+    public async Task<bool> ExecuteAsync()
     {
         consoleHelper.PrintHeader(Description);
 
@@ -23,7 +23,7 @@ public class BookAdder(
             Console.WriteLine("Title should not be empty");
 
             consoleHelper.PressToContinue();
-            return;
+            return false;
         }
         var author = prompter.Ask("Author: ");
         if (string.IsNullOrEmpty(author))
@@ -31,7 +31,7 @@ public class BookAdder(
             Console.WriteLine("Author should not be empty");
 
             consoleHelper.PressToContinue();
-            return;
+            return false;
         }
 
         var currentYear = DateTime.Now.Year;
@@ -86,5 +86,6 @@ public class BookAdder(
         Console.WriteLine("\nBook added successfully!");
 
         consoleHelper.PressToContinue();
+        return false;
     }
 }

@@ -37,11 +37,15 @@ public class JsonStorage(string filePath) : IStorage
     {
         var parsedList = await Get<T>();
 
-        var updatedList = parsedList
-            .Select(item => item.Id == id ? content : item)
-            .ToList();
+        var index = parsedList.FindIndex(item => item.Id == id);
+        if (index == -1)
+        {
+            throw new InvalidOperationException("Item not found.");
+        }
 
-        await WriteDataIntoFile(updatedList);
+        parsedList[index] = content;
+
+        await WriteDataIntoFile(parsedList);
     }
 
     public async Task RemoveById<T>(Guid id) where T : IEntity

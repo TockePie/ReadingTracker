@@ -20,7 +20,7 @@ public class SearchOnline(
     public string Description => "Search books online";
     private const int PageSize = 10;
 
-    public async Task ExecuteAsync()
+    public async Task<bool> ExecuteAsync()
     {
         consoleHelper.PrintHeader(Description);
 
@@ -28,7 +28,7 @@ public class SearchOnline(
         if (string.IsNullOrWhiteSpace(userPrompt))
         {
             Console.WriteLine("Search query cannot be empty.");
-            return;
+            return false;
         }
 
         var storageBooks = await storage.Get<Book>();
@@ -39,13 +39,13 @@ public class SearchOnline(
             Console.WriteLine($"Looking for books (Page: {currentPage})...\n");
 
             var books = await TryFetchPageAsync(userPrompt, currentPage);
-            if (books is null) return;
+            if (books is null) return false;
             if (books.Count == 0)
             {
                 Console.WriteLine("No books found on this page.");
 
                 consoleHelper.PressToContinue();
-                return;
+                return false;
             }
 
             DisplayBooks(books);
@@ -59,7 +59,7 @@ public class SearchOnline(
             {
                 case "" or "C":
                     Console.WriteLine("Selection cancelled.");
-                    return;
+                    return false;
 
                 case "N":
                     currentPage++;
@@ -89,7 +89,7 @@ public class SearchOnline(
                     }
 
                     consoleHelper.PressToContinue();
-                    return;
+                    return false;
 
                 default:
                     Console.WriteLine("Invalid input. Please try again.");

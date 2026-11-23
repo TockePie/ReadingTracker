@@ -14,7 +14,7 @@ public class MyLibrary(
 {
     public string Description => "My library";
 
-    public async Task ExecuteAsync()
+    public async Task<bool> ExecuteAsync()
     {
         consoleHelper.PrintHeader(Description);
 
@@ -24,7 +24,7 @@ public class MyLibrary(
             Console.WriteLine("Your library is empty");
 
             consoleHelper.PressToContinue();
-            return;
+            return false;
         }
 
         DisplayBooks(allBooks);
@@ -69,7 +69,7 @@ public class MyLibrary(
                         await EditBookAsync(selectedBook);
 
                         consoleHelper.PressToContinue();
-                        return;
+                        return false;
                     }
 
                 case 3:
@@ -80,12 +80,12 @@ public class MyLibrary(
                         await RemoveBook(selectedBook);
 
                         consoleHelper.PressToContinue();
-                        return;
+                        return false;
                     }
 
                 case 4:
                     Console.WriteLine();
-                    return;
+                    return false;
             }
         }
     }

@@ -17,7 +17,7 @@ public class ExportLibrary(
     public string Description => "Export library";
     private readonly List<IExporter> _exporters = [.. exporters];
 
-    public async Task ExecuteAsync()
+    public async Task<bool> ExecuteAsync()
     {
         consoleHelper.PrintHeader(Description);
 
@@ -40,7 +40,7 @@ public class ExportLibrary(
 
         if (chosenIndex == 0)
         {
-            return;
+            return false;
         }
 
         var allBooks = await storage.Get<Book>();
@@ -49,7 +49,7 @@ public class ExportLibrary(
             Console.WriteLine("Your library is empty");
 
             consoleHelper.PressToContinue();
-            return;
+            return false;
         }
 
         var exporter = _exporters[chosenIndex - 1];
@@ -61,6 +61,7 @@ public class ExportLibrary(
         Console.WriteLine($"\nExport completed successfully! Saved to: {filePath}");
 
         consoleHelper.PressToContinue();
+        return false;
     }
 
     private static string BuildExportPath(string extension)

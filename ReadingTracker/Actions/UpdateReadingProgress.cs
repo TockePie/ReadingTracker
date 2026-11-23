@@ -13,7 +13,7 @@ public class UpdateReadingProgress(
 {
     public string Description => "Update reading progress";
 
-    public async Task ExecuteAsync()
+    public async Task<bool> ExecuteAsync()
     {
         consoleHelper.PrintHeader(Description);
 
@@ -27,7 +27,7 @@ public class UpdateReadingProgress(
             Console.WriteLine("Your library is empty");
 
             consoleHelper.PressToContinue();
-            return;
+            return false;
         }
 
         Console.WriteLine("Your books currently being read:\n");
@@ -38,7 +38,7 @@ public class UpdateReadingProgress(
         var isValid = consoleHelper.TryPromptBookDetails(readingBooks, out var selectedBook);
         if (!isValid)
         {
-            return;
+            return false;
         }
 
         var maxPages = selectedBook.TotalPages ?? int.MaxValue;
@@ -49,6 +49,7 @@ public class UpdateReadingProgress(
         await UpdateBookCurrentPageAsync(selectedBook, enteredPage);
 
         consoleHelper.PressToContinue();
+        return false;
     }
 
     private void DisplayBooks(IReadOnlyList<Book> books)
