@@ -59,7 +59,33 @@ public class ChangeReadingStatus(
         }
 
         var newStatus = (ReadingStatus)(selectedReadingStatus - 1);
-        await UpdateBookStatusAsync(selectedBook, newStatus);
+        if (newStatus == selectedBook.Status)
+        {
+            Console.WriteLine("\nStatus is already set to this value. No changes made.");
+
+            consoleHelper.PressToContinue();
+            return;
+        }
+
+        var bookToBeUpdated = selectedBook;
+
+        if (newStatus == ReadingStatus.Completed && selectedBook.TotalPages is not null)
+        {
+            var shallSetCurrentPage = prompter.Ask(
+                """
+                Set progress to 100% (all pages read)?
+                [Y]es
+                [N]o
+
+                """
+            );
+            if (shallSetCurrentPage.Equals("Y", StringComparison.OrdinalIgnoreCase))
+            {
+                bookToBeUpdated = selectedBook with { CurrentPage = selectedBook.TotalPages.Value };
+            }
+        }
+
+        await UpdateBookStatusAsync(bookToBeUpdated, newStatus);
 
         consoleHelper.PressToContinue();
     }
@@ -75,12 +101,6 @@ public class ChangeReadingStatus(
 
     private async Task UpdateBookStatusAsync(Book book, ReadingStatus newStatus)
     {
-        if (newStatus == book.Status)
-        {
-            Console.WriteLine("\nStatus is already set to this value. No changes made.");
-            return;
-        }
-
         var updatedBook = book with { Status = newStatus };
         await storage.UpdateItem(book.Id, updatedBook);
 

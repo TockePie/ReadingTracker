@@ -66,13 +66,19 @@ public class BookAdder(
             input => input is > 0 and <= 5
         );
 
+        var currentPage = totalPages is not null &&
+            (ReadingStatus)readingStatus == ReadingStatus.Completed
+                ? totalPages
+                : 0;
+
         var bookToBeAdded = new Book(
             title,
             author,
             publicationYear,
             totalPages,
             (ReadingStatus)readingStatus,
-            rating
+            rating,
+            (int)currentPage
         );
 
         await storage.Save(bookToBeAdded);
