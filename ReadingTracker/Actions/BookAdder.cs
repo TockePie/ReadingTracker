@@ -18,7 +18,21 @@ public class BookAdder(
         consoleHelper.PrintHeader(Description);
 
         var title = prompter.Ask("Title: ");
+        if (string.IsNullOrEmpty(title))
+        {
+            Console.WriteLine("Title should not be empty");
+
+            consoleHelper.PressToContinue();
+            return;
+        }
         var author = prompter.Ask("Author: ");
+        if (string.IsNullOrEmpty(author))
+        {
+            Console.WriteLine("Author should not be empty");
+
+            consoleHelper.PressToContinue();
+            return;
+        }
 
         var currentYear = DateTime.Now.Year;
         var publicationYear = prompter.AskInt(
