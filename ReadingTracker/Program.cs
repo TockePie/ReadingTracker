@@ -9,7 +9,8 @@ var jsonStorage = new JsonStorage("books.json");
 var consoleHelper = new ConsoleHelper(prompter);
 var exporters = new List<IExporter>()
 {
-    new CsvExporter()
+    new CsvExporter(),
+    new JsonExporter()
 };
 
 var menuActions = new Dictionary<int, IMenuAction>
