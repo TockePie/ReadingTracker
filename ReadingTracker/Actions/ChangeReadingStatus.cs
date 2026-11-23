@@ -27,6 +27,9 @@ public class ChangeReadingStatus(
             return;
         }
 
+        DisplayBooks(allBooks);
+        Console.WriteLine();
+
         var isValid = consoleHelper.TryPromptBookDetails(allBooks, out var selectedBook);
         if (!isValid)
         {
@@ -59,6 +62,15 @@ public class ChangeReadingStatus(
         await UpdateBookStatusAsync(selectedBook, newStatus);
 
         consoleHelper.PressToContinue();
+    }
+
+    private void DisplayBooks(IReadOnlyList<Book> books)
+    {
+        foreach (var (index, book) in books.Index())
+        {
+            var displayNumber = index + 1;
+            Console.WriteLine($"{displayNumber}. {book.Title} - {book.DisplayProgress}");
+        }
     }
 
     private async Task UpdateBookStatusAsync(Book book, ReadingStatus newStatus)
