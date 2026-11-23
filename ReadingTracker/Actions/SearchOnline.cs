@@ -31,80 +31,21 @@ public class SearchOnline(
             return;
         }
 
+        var storageBooks = await storage.Get<Book>();
         int currentPage = 1;
 
         while (true)
         {
             Console.WriteLine($"Looking for books (Page: {currentPage})...\n");
 
-            OpenLibrarySearchResponse? response;
-            try
-            {
-                response = await GetBooksAsync(
-                    userPrompt,
-                    page: currentPage,
-                    limit: PageSize
-                );
-            }
-            catch (HttpRequestException ex) when (ex.StatusCode is not null)
-            {
-                Console.WriteLine(
-                    $"""
-                    Unable to search book :(
-                    External library returned an error (HTTP {(int)ex.StatusCode})
-                    Please try again later
-                    """
-                );
-
-                consoleHelper.PressToContinue();
-                return;
-            }
-            catch (HttpRequestException)
-            {
-                Console.WriteLine(
-                    """
-                    Unable to search book :(
-                    This app can't connect to the external library
-                    Please check your internet connection try again later
-                    """
-                );
-
-                consoleHelper.PressToContinue();
-                return;
-            }
-            catch (TaskCanceledException)
-            {
-                Console.WriteLine(
-                    """
-                    Unable to search book :(
-                    The request to external library timed out
-                    Please try again later
-                    """
-                );
-
-                consoleHelper.PressToContinue();
-                return;
-            }
-            catch (JsonException)
-            {
-                Console.WriteLine(
-                    """
-                    Received an invalid response from the external library
-                    Please try again later.
-                    """
-                );
-
-                consoleHelper.PressToContinue();
-                return;
-            }
-
-            var books = response?.Docs;
-            if (books is null || books.Count == 0)
+            var books = await TryFetchPageAsync(userPrompt, currentPage);
+            if (books is null) return;
+            if (books.Count == 0)
             {
                 Console.WriteLine("No books found on this page.");
 
                 consoleHelper.PressToContinue();
-                break;
+                return;
             }
 
             DisplayBooks(books);
@@ -131,12 +72,28 @@ public class SearchOnline(
                 case var _ when int.TryParse(selectedOption, out int selectedIndex) &&
                             selectedIndex >= 1 &&
                             selectedIndex <= books.Count:
-                    await HandleBookSelectionAsync(books[selectedIndex - 1]);
+                    var selectedBook = books[selectedIndex - 1];
+                    var isDuplicate = CheckIfBookIsInLibrary(
+                        storageBooks,
+                        selectedBook.Title,
+                        FormatAuthors(selectedBook.AuthorName),
+                        selectedBook.OpenLibraryKey
+                    );
+                    if (isDuplicate)
+                    {
+                        Console.WriteLine("You already have this book in your library.");
+                    }
+                    else
+                    {
+                        await HandleBookSelectionAsync(selectedBook);
+                    }
+
                     consoleHelper.PressToContinue();
                     return;
 
                 default:
                     Console.WriteLine("Invalid input. Please try again.");
+
                     consoleHelper.PressToContinue();
                     break;
             }
@@ -170,6 +127,44 @@ public class SearchOnline(
         return await response.Content.ReadFromJsonAsync<OpenLibrarySearchResponse>();
     }
 
+    private async Task<IReadOnlyList<ExternalBook>?> TryFetchPageAsync(string query, int page)
+    {
+        try
+        {
+            var response = await GetBooksAsync(
+                query,
+                page,
+                limit: PageSize
+            );
+            return response?.Docs ?? [];
+        }
+        catch (Exception ex) when (ex is HttpRequestException or TaskCanceledException or JsonException)
+        {
+            var message = ex switch
+            {
+                HttpRequestException { StatusCode: { } code } =>
+                    $"External library returned an error (HTTP {(int)code}).",
+                HttpRequestException =>
+                    "This app can't connect to the external library. Check your internet connection.",
+                TaskCanceledException =>
+                    "The request to the external library timed out.",
+                JsonException =>
+                    "Received an invalid response from the external library.",
+                _ => "An unexpected error occurred."
+            };
+
+            Console.WriteLine($"""
+                Unable to search books :(
+                {message}
+                Please try again later.
+                """
+            );
+
+            consoleHelper.PressToContinue();
+            return null;
+        }
+    }
+
     private void DisplayBooks(IReadOnlyList<ExternalBook> books)
     {
         foreach (var (index, book) in books.Index())
@@ -178,14 +173,10 @@ public class SearchOnline(
                 ? $": {book.Subtitle}"
                 : string.Empty;
 
-            var authors = book.AuthorName is not null
-                ? string.Join(", ", book.AuthorName)
-                : "Unknown";
-
             Console.WriteLine(
                 $"""
                 {index + 1}.  {book.Title}{subtitle}
-                    Author: {string.Join(", ", authors)}
+                    Author: {FormatAuthors(book.AuthorName)}
                     First published: {book.FirstPublishYear}
                     Open library ID: {book.OpenLibraryKey}
 
@@ -196,7 +187,9 @@ public class SearchOnline(
 
     private void PrintPaginationOptions(int bookCount, int currentPage)
     {
-        List<string> userOptions = [$"1-{bookCount}: Select book", "[N]ext page"];
+        List<string> userOptions = [];
+        userOptions.Add($"1-{bookCount}: Select book");
+        userOptions.Add("[N]ext page");
 
         if (currentPage > 1)
         {
@@ -205,8 +198,26 @@ public class SearchOnline(
 
         userOptions.Add("[C]ancel");
 
-        Console.WriteLine(string.Join("\n", userOptions));
+        Console.WriteLine(string.Join(Environment.NewLine, userOptions));
         Console.WriteLine();
+    }
+
+    private bool CheckIfBookIsInLibrary(
+        IReadOnlyList<Book> storageBooks,
+        string title,
+        string author,
+        string? externalId
+    )
+    {
+        return storageBooks.Any(book =>
+            (!string.IsNullOrWhiteSpace(externalId) &&
+             string.Equals(book.ExternalId, externalId, StringComparison.OrdinalIgnoreCase)
+            )
+            ||
+            (string.Equals(book.Title.Trim(), title.Trim(), StringComparison.OrdinalIgnoreCase) &&
+             string.Equals(book.Author.Trim(), author.Trim(), StringComparison.OrdinalIgnoreCase)
+            )
+        );
     }
 
     private async Task HandleBookSelectionAsync(ExternalBook book)
@@ -247,14 +258,14 @@ public class SearchOnline(
         var readingStatus = selectedReadingStatus - 1;
 
         var rating = prompter.AskInt(
-            "Your rating (0-5, or skip): ",
+            "Your rating (1-5, or skip): ",
             isOptional: true,
-            input => input is >= 0 and <= 5
+            input => input is > 0 and <= 5
         );
 
         var bookToBeAdded = new Book(
             book.Title,
-            string.Join(", ", book.AuthorName) ?? "Unknown",
+            FormatAuthors(book.AuthorName),
             book.FirstPublishYear,
             totalPages,
             (ReadingStatus)readingStatus,
@@ -269,39 +280,43 @@ public class SearchOnline(
         Console.WriteLine("\nBook added successfully!");
     }
 
-    private void PrintBookDetails(ExternalBook doc)
+    private void PrintBookDetails(ExternalBook book)
     {
         Console.WriteLine("\n========== BOOK DETAILS ==========");
 
         consoleHelper.PrintField(
             "Title",
-            doc.Title ?? "Unknown Title"
+            book.Title ?? "Unknown Title"
         );
 
-        var authors = doc.AuthorName is { Count: > 0 }
-            ? string.Join(", ", doc.AuthorName)
-            : "Unknown Author";
         consoleHelper.PrintField(
             "Author(s)",
-            authors
+            FormatAuthors(book.AuthorName)
         );
 
-        if (doc.FirstPublishYear is not null)
+        if (book.FirstPublishYear is not null)
         {
             consoleHelper.PrintField(
                 "First published",
-                doc.FirstPublishYear
+                book.FirstPublishYear
             );
         }
 
-        if (doc.Language is { Count: > 0 })
+        if (book.Language is { Count: > 0 })
         {
             consoleHelper.PrintField(
                 "Languages",
-                string.Join(", ", doc.Language.Take(5))
+                string.Join(", ", book.Language.Take(5))
             );
         }
 
         Console.WriteLine("==================================\n");
+    }
+
+    private static string FormatAuthors(IReadOnlyList<string>? authors)
+    {
+        return authors is { Count: > 0 }
+            ? string.Join(", ", authors)
+            : "Unknown";
     }
 }
