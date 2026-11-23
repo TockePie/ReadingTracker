@@ -133,7 +133,7 @@ public class SearchAndFilterBooks(
     {
         var enteredRating = prompter.AskInt(
             "Enter a rating number from 1 to 5",
-            input => input is >= 0 and <= 5
+            input => input is > 0 and <= 5
         );
 
         var matches = books
