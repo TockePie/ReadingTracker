@@ -58,8 +58,8 @@ public class ReadingStatistics(
         );
 
         consoleHelper.PrintField(
-            "Pages remaining",
-            books.Sum(book => (book.TotalPages - book.CurrentPage) ?? 0)
+            "Pages remaining in library",
+            books.Sum(book => Math.Max(0, (book.TotalPages - book.CurrentPage) ?? 0))
         );
 
         var averageRating = CalculateAverageRating(books);
@@ -72,7 +72,7 @@ public class ReadingStatistics(
         }
         Console.WriteLine();
 
-        Console.WriteLine("Most read author:");
+        Console.WriteLine("Author with most completed books:");
         var (Author, Count) = CalculateMostReadAuthor(books);
         Console.WriteLine($"{Author} - {Count} books completed");
     }
