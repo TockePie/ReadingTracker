@@ -18,7 +18,7 @@ public record ExternalBook(
     IReadOnlyList<string>? AuthorName,
 
     [property: JsonPropertyName("cover_i")]
-    int CoverId,
+    int? CoverId,
 
     [property: JsonPropertyName("first_publish_year")]
     int? FirstPublishYear,

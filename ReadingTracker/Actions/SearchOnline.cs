@@ -77,7 +77,7 @@ public class SearchOnline(
                             selectedIndex <= books.Count:
                     await HandleBookSelectionAsync(books[selectedIndex - 1]);
                     consoleHelper.PressToContinue();
-                    break;
+                    return;
 
                 default:
                     Console.WriteLine("Invalid input. Please try again.");
@@ -131,7 +131,7 @@ public class SearchOnline(
                 {index + 1}.  {book.Title}{subtitle}
                     Author: {string.Join(", ", authors)}
                     First published: {book.FirstPublishYear}
-                    Open library ID: {book.CoverId}
+                    Open library ID: {book.OpenLibraryKey}
 
                 """
             );
@@ -203,7 +203,10 @@ public class SearchOnline(
             totalPages,
             (ReadingStatus)readingStatus,
             rating
-        );
+        )
+        {
+            ExternalId = book.OpenLibraryKey
+        };
 
         await storage.Save(bookToBeAdded);
 

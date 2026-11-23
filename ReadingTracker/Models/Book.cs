@@ -31,6 +31,9 @@ public record Book(
     [JsonPropertyName("id")]
     public Guid Id { get; init; } = Guid.NewGuid();
 
+    [JsonPropertyName("externalId")]
+    public string? ExternalId { get; init; }
+
     public double? CompletionRate => TotalPages > 0
         ? Math.Round((double)CurrentPage / TotalPages.Value * 100, 1)
         : null;
