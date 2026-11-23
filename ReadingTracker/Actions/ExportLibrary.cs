@@ -1,4 +1,5 @@
 using ReadingTracker.ConsoleHelper;
+using ReadingTracker.Exporters;
 using ReadingTracker.Models;
 using ReadingTracker.Prompter;
 using ReadingTracker.Storage;
@@ -8,30 +9,36 @@ namespace ReadingTracker.Actions;
 public class ExportLibrary(
     IPrompter prompter,
     IStorage storage,
-    ICsvStorage csvStorage,
-    IConsoleHelper consoleHelper
+    IConsoleHelper consoleHelper,
+    IEnumerable<IExporter> exporters
 ) : IMenuAction
 {
+    private const string ExportDirectory = "exports";
     public string Description => "Export library";
+    private readonly List<IExporter> _exporters = [.. exporters];
 
     public async Task ExecuteAsync()
     {
         consoleHelper.PrintHeader(Description);
 
-        var chosenFormat = prompter.AskInt(
-            """
+        var menuOptions = string.Join(
+            Environment.NewLine,
+            _exporters.Select((exporter, index) => $"{index + 1}. {exporter.FormatName}")
+        );
+
+        var chosenIndex = prompter.AskInt(
+            $"""
             Choose format:
 
-            1. JSON
-            2. CSV
+            {menuOptions}
             0. Back
 
             Select format: 
             """,
-            input => input is >= 0 and < 3
+            input => input >= 0 && input <= _exporters.Count
         );
 
-        if (chosenFormat == 0)
+        if (chosenIndex == 0)
         {
             return;
         }
@@ -45,13 +52,20 @@ public class ExportLibrary(
             return;
         }
 
-        if (chosenFormat == 2)
-        {
-            csvStorage.Save(allBooks);
-        }
+        var exporter = _exporters[chosenIndex - 1];
+        var filePath = BuildExportPath(exporter.FileExtension);
 
-        Console.WriteLine("\nExport completed successfully!");
+        Directory.CreateDirectory(ExportDirectory);
+        await exporter.ExportAsync(allBooks, filePath);
+
+        Console.WriteLine($"\nExport completed successfully! Saved to: {filePath}");
 
         consoleHelper.PressToContinue();
+    }
+
+    private static string BuildExportPath(string extension)
+    {
+        var timestamp = DateTime.Now.ToString("yyyy-MM-dd_HHmmss");
+        return Path.Combine(ExportDirectory, $"library_{timestamp}.{extension}");
     }
 }
