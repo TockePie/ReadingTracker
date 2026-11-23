@@ -1,20 +1,18 @@
-using System.Net.Http.Json;
 using System.Text.Json;
-using System.Web;
 
 using ReadingTracker.ConsoleHelper;
 using ReadingTracker.Models;
 using ReadingTracker.Prompter;
+using ReadingTracker.Services;
 using ReadingTracker.Storage;
 
 namespace ReadingTracker.Actions;
 
 public class SearchOnline(
-    HttpClient httpClient,
+    IExternalLibrary externalLibrary,
     IPrompter prompter,
     IStorage storage,
-    IConsoleHelper consoleHelper,
-    string baseUrl = "https://openlibrary.org/search.json"
+    IConsoleHelper consoleHelper
 ) : IMenuAction
 {
     public string Description => "Search books online";
@@ -100,38 +98,11 @@ public class SearchOnline(
         }
     }
 
-    private async Task<OpenLibrarySearchResponse> GetBooksAsync(
-        string query,
-        int page = 1,
-        int limit = 10
-    )
-    {
-        var queryParams = HttpUtility.ParseQueryString(string.Empty);
-        queryParams["q"] = query;
-        queryParams["page"] = page.ToString();
-        queryParams["limit"] = limit.ToString();
-
-        var uriBuilder = new UriBuilder(baseUrl)
-        {
-            Query = queryParams.ToString()
-        };
-
-        using var request = new HttpRequestMessage(HttpMethod.Get, uriBuilder.Uri);
-        request.Headers.UserAgent.ParseAdd(
-            "ReadingTracker/1.0 (144056146+TockePie@users.noreply.github.com)"
-        );
-
-        using var response = await httpClient.SendAsync(request);
-        response.EnsureSuccessStatusCode();
-
-        return await response.Content.ReadFromJsonAsync<OpenLibrarySearchResponse>();
-    }
-
     private async Task<IReadOnlyList<ExternalBook>?> TryFetchPageAsync(string query, int page)
     {
         try
         {
-            var response = await GetBooksAsync(
+            var response = await externalLibrary.GetBooksAsync(
                 query,
                 page,
                 limit: PageSize
