@@ -1,4 +1,5 @@
 using System.Net.Http.Json;
+using System.Text.Json;
 using System.Web;
 
 using ReadingTracker.ConsoleHelper;
@@ -36,13 +37,68 @@ public class SearchOnline(
         {
             Console.WriteLine($"Looking for books (Page: {currentPage})...\n");
 
-            var response = await GetBooksAsync(
-                userPrompt,
-                page: currentPage,
-                limit: PageSize
-            );
-            var books = response?.Docs;
+            OpenLibrarySearchResponse? response;
+            try
+            {
+                response = await GetBooksAsync(
+                    userPrompt,
+                    page: currentPage,
+                    limit: PageSize
+                );
+            }
+            catch (HttpRequestException ex) when (ex.StatusCode is not null)
+            {
+                Console.WriteLine(
+                    $"""
+                    Unable to search book :(
+                    External library returned an error (HTTP {(int)ex.StatusCode})
+                    Please try again later
+                    """
+                );
 
+                consoleHelper.PressToContinue();
+                return;
+            }
+            catch (HttpRequestException)
+            {
+                Console.WriteLine(
+                    """
+                    Unable to search book :(
+                    This app can't connect to the external library
+                    Please check your internet connection try again later
+                    """
+                );
+
+                consoleHelper.PressToContinue();
+                return;
+            }
+            catch (TaskCanceledException)
+            {
+                Console.WriteLine(
+                    """
+                    Unable to search book :(
+                    The request to external library timed out
+                    Please try again later
+                    """
+                );
+
+                consoleHelper.PressToContinue();
+                return;
+            }
+            catch (JsonException)
+            {
+                Console.WriteLine(
+                    """
+                    Received an invalid response from the external library
+                    Please try again later.
+                    """
+                );
+
+                consoleHelper.PressToContinue();
+                return;
+            }
+
+            var books = response?.Docs;
             if (books is null || books.Count == 0)
             {
                 Console.WriteLine("No books found on this page.");
