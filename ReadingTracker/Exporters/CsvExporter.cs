@@ -1,20 +1,24 @@
 using System.Reflection;
 using System.Text;
 
-namespace ReadingTracker.Storage;
+namespace ReadingTracker.Exporters;
 
-public class CsvStorage(string filePath) : ICsvStorage
+public class CsvExporter : IExporter
 {
+    public string FormatName => "CSV";
+
+    public string FileExtension => "csv";
+
     private static readonly char[] SpecialCharacters = [',', '"', '\r', '\n'];
 
-    public void Save<T>(IEnumerable<T> content) where T : IEntity
+    public async Task ExportAsync<T>(IEnumerable<T> content, string filePath)
     {
         var result = BuildString(content);
 
-        File.WriteAllText(filePath, result, new UTF8Encoding(false));
+        await File.WriteAllTextAsync(filePath, result, new UTF8Encoding(false));
     }
 
-    private static string BuildString<T>(IEnumerable<T> content) where T : IEntity
+    private static string BuildString<T>(IEnumerable<T> content)
     {
         var stringBuilder = new StringBuilder();
 
