@@ -18,8 +18,11 @@ public class UpdateReadingProgress(
         consoleHelper.PrintHeader(Description);
 
         var allBooks = await storage.Get<Book>();
-        //TODO: Filter here books only with status "Reading"
-        if (allBooks is not { Count: > 0 })
+        var readingBooks = allBooks
+            .Where(book => book.Status == ReadingStatus.Reading)
+            .ToList();
+
+        if (readingBooks is not { Count: > 0 })
         {
             Console.WriteLine("Your library is empty");
 
@@ -28,10 +31,11 @@ public class UpdateReadingProgress(
         }
 
         Console.WriteLine("Your books currently being read:\n");
-        DisplayBooks(allBooks);
+
+        DisplayBooks(readingBooks);
         Console.WriteLine();
 
-        var isValid = consoleHelper.TryPromptBookDetails(allBooks, out var selectedBook);
+        var isValid = consoleHelper.TryPromptBookDetails(readingBooks, out var selectedBook);
         if (!isValid)
         {
             return;
@@ -40,7 +44,7 @@ public class UpdateReadingProgress(
         var maxPages = selectedBook.TotalPages ?? int.MaxValue;
         var enteredPage = prompter.AskInt(
             "Enter your current page: ",
-            input => input > 0 && input <= maxPages
+            input => input >= 0 && input <= maxPages
         );
         await UpdateBookCurrentPageAsync(selectedBook, enteredPage);
 
