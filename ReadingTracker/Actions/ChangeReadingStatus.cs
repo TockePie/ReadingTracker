@@ -18,8 +18,8 @@ public class ChangeReadingStatus(
     {
         consoleHelper.PrintHeader(Description);
 
-        var allBooks = await storage.Get<Book>();
-        if (allBooks is not { Count: > 0 })
+        var books = await storage.Get<Book>();
+        if (books is not { Count: > 0 })
         {
             Console.WriteLine("Your library is empty");
 
@@ -27,11 +27,10 @@ public class ChangeReadingStatus(
             return false;
         }
 
-        DisplayBooks(allBooks);
+        DisplayBooks(books);
         Console.WriteLine();
 
-        var isValid = consoleHelper.TryPromptBookDetails(allBooks, out var selectedBook);
-        if (!isValid)
+        if (!consoleHelper.TryPromptBookDetails(books, out var selectedBook))
         {
             return false;
         }
@@ -67,25 +66,30 @@ public class ChangeReadingStatus(
             return false;
         }
 
-        var bookToBeUpdated = selectedBook;
+        var updatedBook = selectedBook with { Status = newStatus };
 
-        if (newStatus == ReadingStatus.Completed && selectedBook.TotalPages is not null)
+        if (newStatus == ReadingStatus.Completed
+            && selectedBook.TotalPages is int totalPages
+            && selectedBook.CurrentPage < totalPages
+        )
         {
-            var shallSetCurrentPage = prompter.Ask(
+            var response = prompter.Ask(
                 """
                 Set progress to 100% (all pages read)?
-                [Y]es
-                [N]o
-
+                [Y]es | [N]o: 
                 """
             );
-            if (shallSetCurrentPage.Equals("Y", StringComparison.OrdinalIgnoreCase))
+            if (response.Equals("Y", StringComparison.OrdinalIgnoreCase)
+                || response.Equals("Yes", StringComparison.OrdinalIgnoreCase)
+            )
             {
-                bookToBeUpdated = selectedBook with { CurrentPage = selectedBook.TotalPages.Value };
+                updatedBook = updatedBook with { CurrentPage = totalPages };
             }
         }
 
-        await UpdateBookStatusAsync(bookToBeUpdated, newStatus);
+        await storage.UpdateItem(updatedBook.Id, updatedBook);
+
+        Console.WriteLine("\nStatus changed successfully!");
 
         consoleHelper.PressToContinue();
         return false;
@@ -98,13 +102,5 @@ public class ChangeReadingStatus(
             var displayNumber = index + 1;
             Console.WriteLine($"{displayNumber}. {book.Title} - {book.DisplayProgress}");
         }
-    }
-
-    private async Task UpdateBookStatusAsync(Book book, ReadingStatus newStatus)
-    {
-        var updatedBook = book with { Status = newStatus };
-        await storage.UpdateItem(book.Id, updatedBook);
-
-        Console.WriteLine("\nStatus changed successfully!");
     }
 }
