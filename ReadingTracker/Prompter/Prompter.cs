@@ -23,18 +23,6 @@ public class Prompter : IPrompter
         return GetInt(prompt, isOptional: false, validator, errorMessage)!.Value;
     }
 
-    public int AskInt(
-        string prompt,
-        int defaultValue,
-        Func<int, bool>? validator = null,
-        string? errorMessage = null
-    )
-    {
-        var display = defaultValue.ToString() ?? "No info";
-        var input = GetInt($"{prompt} [{display}]: ", isOptional: true, validator, errorMessage);
-        return input ?? defaultValue;
-    }
-
     public int? AskOptionalInt(
         string prompt,
         Func<int, bool>? validator = null,
@@ -42,6 +30,18 @@ public class Prompter : IPrompter
     )
     {
         return GetInt(prompt, isOptional: true, validator, errorMessage);
+    }
+
+    public int? AskOptionalInt(
+        string prompt,
+        int? defaultValue,
+        Func<int, bool>? validator = null,
+        string? errorMessage = null
+    )
+    {
+        var display = defaultValue?.ToString() ?? "No info";
+        var input = GetInt($"{prompt} [{display}]: ", isOptional: true, validator, errorMessage);
+        return input ?? defaultValue;
     }
 
     private int? GetInt(

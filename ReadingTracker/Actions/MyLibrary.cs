@@ -109,20 +109,20 @@ public class MyLibrary(
         {
             Title = prompter.Ask("New title", book.Title),
             Author = prompter.Ask("New author", book.Author),
-            PublicationYear = prompter.AskInt(
+            PublicationYear = prompter.AskOptionalInt(
                 "New publication year",
-                book.PublicationYear,
+                defaultValue: book.PublicationYear,
                 input => input > 0 && input <= currentYear
             ),
-            TotalPages = prompter.AskInt(
+            TotalPages = prompter.AskOptionalInt(
                 "New total pages",
-                book.TotalPages,
+                defaultValue: book.TotalPages,
                 input => input > 0 && input >= book.CurrentPage,
                 "The number of total pages should be at least as many as pages you have already read."
             ),
-            Rating = prompter.AskInt(
+            Rating = prompter.AskOptionalInt(
                 "New rating",
-                book.Rating,
+                defaultValue: book.Rating,
                 input => input is > 0 and <= 5
             )
         };

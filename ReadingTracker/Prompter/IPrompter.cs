@@ -11,15 +11,15 @@ public interface IPrompter
         string? errorMessage = null
     );
 
-    int AskInt(
+    int? AskOptionalInt(
         string prompt,
-        int defaultValue,
         Func<int, bool>? validator = null,
         string? errorMessage = null
     );
 
     int? AskOptionalInt(
         string prompt,
+        int? defaultValue,
         Func<int, bool>? validator = null,
         string? errorMessage = null
     );
