@@ -21,12 +21,40 @@ public class ExportLibrary(
     {
         consoleHelper.PrintHeader(Description);
 
+        var books = await storage.Get<Book>();
+        if (books is not { Count: > 0 })
+        {
+            Console.WriteLine("Your library is empty");
+
+            consoleHelper.PressToContinue();
+            return false;
+        }
+
+        var exporter = SelectExporter();
+        if (exporter is null)
+        {
+            return false;
+        }
+
+        var filePath = BuildExportPath(exporter.FileExtension);
+
+        Directory.CreateDirectory(ExportDirectory);
+        await exporter.ExportAsync(books, filePath);
+
+        Console.WriteLine($"\nExport completed successfully! Saved to: {filePath}");
+
+        consoleHelper.PressToContinue();
+        return false;
+    }
+
+    private IExporter? SelectExporter()
+    {
         var menuOptions = string.Join(
             Environment.NewLine,
             _exporters.Select((exporter, index) => $"{index + 1}. {exporter.FormatName}")
         );
 
-        var chosenIndex = prompter.AskInt(
+        var chosenFormat = prompter.AskInt(
             $"""
             Choose format:
 
@@ -38,30 +66,14 @@ public class ExportLibrary(
             input => input >= 0 && input <= _exporters.Count
         );
 
-        if (chosenIndex == 0)
+        if (chosenFormat == 0)
         {
-            return false;
+            return null;
         }
-
-        var allBooks = await storage.Get<Book>();
-        if (allBooks is not { Count: > 0 })
+        else
         {
-            Console.WriteLine("Your library is empty");
-
-            consoleHelper.PressToContinue();
-            return false;
+            return _exporters[chosenFormat - 1];
         }
-
-        var exporter = _exporters[chosenIndex - 1];
-        var filePath = BuildExportPath(exporter.FileExtension);
-
-        Directory.CreateDirectory(ExportDirectory);
-        await exporter.ExportAsync(allBooks, filePath);
-
-        Console.WriteLine($"\nExport completed successfully! Saved to: {filePath}");
-
-        consoleHelper.PressToContinue();
-        return false;
     }
 
     private static string BuildExportPath(string extension)

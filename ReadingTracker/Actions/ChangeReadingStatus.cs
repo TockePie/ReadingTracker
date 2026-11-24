@@ -39,7 +39,7 @@ public class ChangeReadingStatus(
         Console.WriteLine($"\nBook: {selectedBook.Title}");
         Console.WriteLine($"Current status: {selectedBook.Status.GetDescription()}");
 
-        var selectedReadingStatus = prompter.AskInt(
+        var statusChoise = prompter.AskInt(
             """
 
             Choose new status:
@@ -50,15 +50,15 @@ public class ChangeReadingStatus(
 
             New status: 
             """,
-            input => input is >= 0 and < 4
+            input => input is >= 0 and <= 3
         );
 
-        if (selectedReadingStatus == 0)
+        if (statusChoise == 0)
         {
             return false;
         }
 
-        var newStatus = (ReadingStatus)(selectedReadingStatus - 1);
+        var newStatus = (ReadingStatus)(statusChoise - 1);
         if (newStatus == selectedBook.Status)
         {
             Console.WriteLine("\nStatus is already set to this value. No changes made.");

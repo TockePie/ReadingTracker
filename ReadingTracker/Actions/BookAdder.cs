@@ -18,15 +18,16 @@ public class BookAdder(
         consoleHelper.PrintHeader(Description);
 
         var title = prompter.Ask("Title: ");
-        if (string.IsNullOrEmpty(title))
+        if (string.IsNullOrWhiteSpace(title))
         {
             Console.WriteLine("Title should not be empty");
 
             consoleHelper.PressToContinue();
             return false;
         }
+
         var author = prompter.Ask("Author: ");
-        if (string.IsNullOrEmpty(author))
+        if (string.IsNullOrWhiteSpace(author))
         {
             Console.WriteLine("Author should not be empty");
 
@@ -35,19 +36,17 @@ public class BookAdder(
         }
 
         var currentYear = DateTime.Now.Year;
-        var publicationYear = prompter.AskInt(
+        var publicationYear = prompter.AskOptionalInt(
             "Publication year: ",
-            isOptional: true,
-            input => input > 0 && input <= currentYear
+            year => year > 0 && year <= currentYear
         );
 
-        var totalPages = prompter.AskInt(
+        var totalPages = prompter.AskOptionalInt(
             "Total pages: ",
-            isOptional: true,
-            input => input is > 0
+            pages => pages > 0
         );
 
-        var selectedReadingStatus = prompter.AskInt(
+        var statusChoise = prompter.AskInt(
             """
             Reading status:
             1. Want to Read
@@ -56,32 +55,30 @@ public class BookAdder(
             Select status:
 
             """,
-            input => input is >= 1 and < 4
+            input => input is >= 1 and <= 3
         );
-        var readingStatus = selectedReadingStatus - 1;
+        var readingStatus = (ReadingStatus)(statusChoise - 1);
 
-        var rating = prompter.AskInt(
+        var rating = prompter.AskOptionalInt(
             "Your rating (1-5, or skip): ",
-            isOptional: true,
-            input => input is > 0 and <= 5
+            input => input is >= 1 and <= 5
         );
 
-        var currentPage = totalPages is not null &&
-            (ReadingStatus)readingStatus == ReadingStatus.Completed
-                ? totalPages
-                : 0;
+        var currentPage = readingStatus == ReadingStatus.Completed
+            ? (totalPages ?? 0)
+            : 0;
 
-        var bookToBeAdded = new Book(
+        var newBook = new Book(
             title,
             author,
             publicationYear,
             totalPages,
-            (ReadingStatus)readingStatus,
+            readingStatus,
             rating,
-            (int)currentPage
+            currentPage
         );
 
-        await storage.Save(bookToBeAdded);
+        await storage.Save(newBook);
 
         Console.WriteLine("\nBook added successfully!");
 

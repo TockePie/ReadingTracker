@@ -2,89 +2,66 @@ namespace ReadingTracker.Prompter;
 
 public class Prompter : IPrompter
 {
-
-    public string Ask(string message)
+    public string Ask(string prompt)
     {
-        Console.Write(message);
+        Console.Write(prompt);
         return Console.ReadLine()?.Trim() ?? string.Empty;
     }
 
-    public string Ask(string label, string defaultValue)
+    public string Ask(string prompt, string defaultValue)
     {
-        var input = Ask($"{label} [{defaultValue}]: ");
+        var input = Ask($"{prompt} [{defaultValue}]: ");
         return input == string.Empty ? defaultValue : input;
     }
 
-    public int AskInt(string message)
-    {
-        return GetInt(message, isOptional: false, condition: null, errorMessage: null)!.Value;
-    }
-
-    public int AskInt(string message, string errorMessage)
-    {
-        return GetInt(message, isOptional: false, condition: null, errorMessage)!.Value;
-    }
-
-    public int? AskInt(string message, bool isOptional)
-    {
-        return GetInt(message, isOptional, condition: null, errorMessage: null);
-    }
-
-    public int? AskInt(string message, bool isOptional, string errorMessage)
-    {
-        return GetInt(message, isOptional, condition: null, errorMessage);
-    }
-
-    public int AskInt(string message, Func<int, bool> condition)
-    {
-        return GetInt(message, isOptional: false, condition, errorMessage: null)!.Value;
-    }
-
-    public int AskInt(string message, Func<int, bool> condition, string errorMessage)
-    {
-        return GetInt(message, isOptional: false, condition, errorMessage)!.Value;
-    }
-
-    public int? AskInt(string message, bool isOptional, Func<int, bool> condition)
-    {
-        return GetInt(message, isOptional, condition, errorMessage: null);
-    }
-
-    public int? AskInt(string message, bool isOptional, Func<int, bool> condition, string errorMessage)
-    {
-        return GetInt(message, isOptional, condition, errorMessage);
-    }
-
-    public int? AskInt(
-        string label,
-        int? defaultValue,
-        Func<int, bool>? condition = null,
+    public int AskInt(
+        string prompt,
+        Func<int, bool>? validator = null,
         string? errorMessage = null
     )
     {
-        var display = defaultValue?.ToString() ?? "No info";
-        var input = AskInt($"{label} [{display}]: ", isOptional: true, condition, errorMessage);
+        return GetInt(prompt, isOptional: false, validator, errorMessage)!.Value;
+    }
+
+    public int AskInt(
+        string prompt,
+        int defaultValue,
+        Func<int, bool>? validator = null,
+        string? errorMessage = null
+    )
+    {
+        var display = defaultValue.ToString() ?? "No info";
+        var input = GetInt($"{prompt} [{display}]: ", isOptional: true, validator, errorMessage);
         return input ?? defaultValue;
     }
 
+    public int? AskOptionalInt(
+        string prompt,
+        Func<int, bool>? validator = null,
+        string? errorMessage = null
+    )
+    {
+        return GetInt(prompt, isOptional: true, validator, errorMessage);
+    }
+
     private int? GetInt(
-        string message,
+        string prompt,
         bool isOptional,
-        Func<int, bool>? condition,
+        Func<int, bool>? validator,
         string? errorMessage
     )
     {
         while (true)
         {
-            var basePrompt = Ask(message);
+            var input = Ask(prompt);
 
-            if (isOptional && string.IsNullOrWhiteSpace(basePrompt))
+            if (isOptional && string.IsNullOrWhiteSpace(input))
             {
                 return null;
             }
 
-            var isValid = int.TryParse(basePrompt, out int validated);
-            if (isValid && (condition is null || condition(validated)))
+            var isNumber = int.TryParse(input, out int validated);
+            if (isNumber && (validator is null || validator(validated)))
             {
                 return validated;
             }

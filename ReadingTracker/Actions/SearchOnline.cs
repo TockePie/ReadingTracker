@@ -209,13 +209,12 @@ public class SearchOnline(
             return;
         }
 
-        var totalPages = prompter.AskInt(
+        var totalPages = prompter.AskOptionalInt(
             "Total pages: ",
-            isOptional: true,
             input => input is > 0
         );
 
-        var selectedReadingStatus = prompter.AskInt(
+        var chosenStatus = prompter.AskInt(
             """
             Reading status:
             1. Want to Read
@@ -224,29 +223,28 @@ public class SearchOnline(
             Select status:
 
             """,
-            input => input is >= 1 and < 4
+            input => input is >= 1 and <= 3
         );
-        var readingStatus = selectedReadingStatus - 1;
+        var readingStatus = (ReadingStatus)(chosenStatus - 1);
 
-        var rating = prompter.AskInt(
+        var rating = prompter.AskOptionalInt(
             "Your rating (1-5, or skip): ",
-            isOptional: true,
-            input => input is > 0 and <= 5
+            input => input is >= 1 and <= 5
         );
 
-        var bookToBeAdded = new Book(
+        var newBook = new Book(
             book.Title,
             FormatAuthors(book.AuthorName),
             book.FirstPublishYear,
             totalPages,
-            (ReadingStatus)readingStatus,
+            readingStatus,
             rating
         )
         {
             ExternalId = book.OpenLibraryKey
         };
 
-        await storage.Save(bookToBeAdded);
+        await storage.Save(newBook);
 
         Console.WriteLine("\nBook added successfully!");
     }

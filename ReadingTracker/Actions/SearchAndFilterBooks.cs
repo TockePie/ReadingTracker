@@ -40,7 +40,7 @@ public class SearchAndFilterBooks(
 
             Select an option: 
             """,
-            input => input is >= 0 and < 8
+            input => input is >= 0 and <= 7
         );
 
         switch (selectedOption)
@@ -120,7 +120,7 @@ public class SearchAndFilterBooks(
             3. Completed
             Select status: 
             """,
-            input => input is >= 1 and < 4
+            input => input is >= 1 and <= 3
         );
 
         var matches = books
@@ -134,7 +134,7 @@ public class SearchAndFilterBooks(
     {
         var enteredRating = prompter.AskInt(
             "Enter a rating number from 1 to 5",
-            input => input is > 0 and <= 5
+            input => input is >= 1 and <= 5
         );
 
         var matches = books
