@@ -2,11 +2,13 @@
 using ReadingTracker.ConsoleHelper;
 using ReadingTracker.Exporters;
 using ReadingTracker.Prompter;
+using ReadingTracker.Services;
 using ReadingTracker.Storage;
 
 var prompter = new Prompter();
 var jsonStorage = new JsonStorage("books.json");
 var consoleHelper = new ConsoleHelper(prompter);
+var externalLibrary = new OpenLibraryClient(new HttpClient());
 var exporters = new List<IExporter>()
 {
     new CsvExporter(),
@@ -16,7 +18,7 @@ var exporters = new List<IExporter>()
 var menuActions = new Dictionary<int, IMenuAction>
 {
     { 1, new MyLibrary(prompter, jsonStorage, consoleHelper) },
-    { 2, new SearchOnline(new HttpClient(), prompter, jsonStorage, consoleHelper) },
+    { 2, new SearchOnline(externalLibrary, prompter, jsonStorage, consoleHelper) },
     { 3, new BookAdder(prompter, jsonStorage, consoleHelper) },
     { 4, new UpdateReadingProgress(prompter, jsonStorage, consoleHelper) },
     { 5, new ChangeReadingStatus(prompter, jsonStorage, consoleHelper) },
@@ -43,7 +45,9 @@ class Runner(IReadOnlyDictionary<int, IMenuAction> menuActions, IPrompter prompt
                 errorMessage: "Select an option between 0 and 8"
             );
 
-            var shouldContinue = await menuActions[selectedOption].ExecuteAsync();
+            var shouldContinue = await ExecuteSafelyAsync(
+                () => menuActions[selectedOption].ExecuteAsync()
+            );
 
             if (!shouldContinue)
             {
@@ -73,5 +77,28 @@ class Runner(IReadOnlyDictionary<int, IMenuAction> menuActions, IPrompter prompt
         }
 
         Console.WriteLine();
+    }
+
+    private async Task<bool> ExecuteSafelyAsync(Func<Task<bool>> action)
+    {
+        try
+        {
+            return await action();
+        }
+        catch (StorageException ex)
+        {
+            Console.WriteLine($"\nStorage Error: {ex.Message}\n");
+            return true;
+        }
+        catch (InvalidOperationException ex)
+        {
+            Console.WriteLine($"\nError: {ex.Message}\n");
+            return true;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"\nUnexpected Error: {ex.Message}\n");
+            return true;
+        }
     }
 }
