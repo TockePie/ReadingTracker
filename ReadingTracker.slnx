@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="ReadingTracker.Tests/ReadingTracker.Tests.csproj" />
+  <Project Path="ReadingTracker/ReadingTracker.csproj" />
+</Solution>
