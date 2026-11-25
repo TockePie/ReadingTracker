@@ -24,7 +24,7 @@ public class MyLibrary(
             Console.WriteLine("Your library is empty");
 
             consoleHelper.PressToContinue();
-            return false;
+            return true;
         }
 
         DisplayBooks(allBooks);
@@ -69,7 +69,7 @@ public class MyLibrary(
                         await EditBookAsync(selectedBook);
 
                         consoleHelper.PressToContinue();
-                        return false;
+                        return true;
                     }
 
                 case 3:
@@ -80,12 +80,12 @@ public class MyLibrary(
                         await RemoveBook(selectedBook);
 
                         consoleHelper.PressToContinue();
-                        return false;
+                        return true;
                     }
 
                 case 4:
                     Console.WriteLine();
-                    return false;
+                    return true;
             }
         }
     }

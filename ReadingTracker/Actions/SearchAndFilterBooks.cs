@@ -24,7 +24,7 @@ public class SearchAndFilterBooks(
             Console.WriteLine("Your library is empty");
 
             consoleHelper.PressToContinue();
-            return false;
+            return true;
         }
 
         var selectedOption = prompter.AskInt(
@@ -46,7 +46,7 @@ public class SearchAndFilterBooks(
         switch (selectedOption)
         {
             case 0:
-                return false;
+                return true;
 
             case 1:
                 SearchByString(
@@ -90,7 +90,7 @@ public class SearchAndFilterBooks(
         }
 
         consoleHelper.PressToContinue();
-        return false;
+        return true;
     }
 
     private void SearchByString(

@@ -23,7 +23,7 @@ public class BookAdder(
             Console.WriteLine("Title should not be empty");
 
             consoleHelper.PressToContinue();
-            return false;
+            return true;
         }
 
         var author = prompter.Ask("Author: ");
@@ -32,7 +32,7 @@ public class BookAdder(
             Console.WriteLine("Author should not be empty");
 
             consoleHelper.PressToContinue();
-            return false;
+            return true;
         }
 
         var currentYear = DateTime.Now.Year;
@@ -83,6 +83,6 @@ public class BookAdder(
         Console.WriteLine("\nBook added successfully!");
 
         consoleHelper.PressToContinue();
-        return false;
+        return true;
     }
 }

@@ -26,7 +26,7 @@ public class SearchOnline(
         if (string.IsNullOrWhiteSpace(userPrompt))
         {
             Console.WriteLine("Search query cannot be empty.");
-            return false;
+            return true;
         }
 
         var storageBooks = await storage.Get<Book>();
@@ -37,13 +37,13 @@ public class SearchOnline(
             Console.WriteLine($"Looking for books (Page: {currentPage})...\n");
 
             var books = await TryFetchPageAsync(userPrompt, currentPage);
-            if (books is null) return false;
+            if (books is null) return true;
             if (books.Count == 0)
             {
                 Console.WriteLine("No books found on this page.");
 
                 consoleHelper.PressToContinue();
-                return false;
+                return true;
             }
 
             DisplayBooks(books);
@@ -57,7 +57,7 @@ public class SearchOnline(
             {
                 case "" or "C":
                     Console.WriteLine("Selection cancelled.");
-                    return false;
+                    return true;
 
                 case "N":
                     currentPage++;
@@ -87,7 +87,7 @@ public class SearchOnline(
                     }
 
                     consoleHelper.PressToContinue();
-                    return false;
+                    return true;
 
                 default:
                     Console.WriteLine("Invalid input. Please try again.");
@@ -111,6 +111,8 @@ public class SearchOnline(
         }
         catch (Exception ex) when (ex is HttpRequestException or TaskCanceledException or JsonException)
         {
+            Console.WriteLine(ex.ToString());
+
             var message = ex switch
             {
                 HttpRequestException { StatusCode: { } code } =>
@@ -198,8 +200,7 @@ public class SearchOnline(
         var shouldBeAdded = prompter.Ask(
             """
             Would you like to add this book to your library?
-            [Y]es
-            [N]o
+            [Y]es | [N]o
             
             """
         );
@@ -220,8 +221,7 @@ public class SearchOnline(
             1. Want to Read
             2. Reading
             3. Completed
-            Select status:
-
+            Select status: 
             """,
             input => input is >= 1 and <= 3
         );

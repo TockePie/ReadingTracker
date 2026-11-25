@@ -24,7 +24,7 @@ public class ChangeReadingStatus(
             Console.WriteLine("Your library is empty");
 
             consoleHelper.PressToContinue();
-            return false;
+            return true;
         }
 
         DisplayBooks(books);
@@ -32,7 +32,7 @@ public class ChangeReadingStatus(
 
         if (!consoleHelper.TryPromptBookDetails(books, out var selectedBook))
         {
-            return false;
+            return true;
         }
 
         Console.WriteLine($"\nBook: {selectedBook.Title}");
@@ -54,7 +54,7 @@ public class ChangeReadingStatus(
 
         if (statusChoise == 0)
         {
-            return false;
+            return true;
         }
 
         var newStatus = (ReadingStatus)(statusChoise - 1);
@@ -63,7 +63,7 @@ public class ChangeReadingStatus(
             Console.WriteLine("\nStatus is already set to this value. No changes made.");
 
             consoleHelper.PressToContinue();
-            return false;
+            return true;
         }
 
         var updatedBook = selectedBook with { Status = newStatus };
@@ -92,7 +92,7 @@ public class ChangeReadingStatus(
         Console.WriteLine("\nStatus changed successfully!");
 
         consoleHelper.PressToContinue();
-        return false;
+        return true;
     }
 
     private void DisplayBooks(IReadOnlyList<Book> books)

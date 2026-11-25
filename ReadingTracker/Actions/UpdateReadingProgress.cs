@@ -27,7 +27,7 @@ public class UpdateReadingProgress(
             Console.WriteLine("You have no books currently being read.");
 
             consoleHelper.PressToContinue();
-            return false;
+            return true;
         }
 
         Console.WriteLine("Your books currently being read:\n");
@@ -37,7 +37,7 @@ public class UpdateReadingProgress(
 
         if (!consoleHelper.TryPromptBookDetails(booksInProgress, out var selectedBook))
         {
-            return false;
+            return true;
         }
 
         var maxPage = selectedBook.TotalPages ?? int.MaxValue;
@@ -53,7 +53,7 @@ public class UpdateReadingProgress(
         await UpdateBookCurrentPageAsync(selectedBook, enteredPage);
 
         consoleHelper.PressToContinue();
-        return false;
+        return true;
     }
 
     private void DisplayBooks(IReadOnlyList<Book> books)

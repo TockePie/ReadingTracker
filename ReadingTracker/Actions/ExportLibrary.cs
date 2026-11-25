@@ -27,13 +27,13 @@ public class ExportLibrary(
             Console.WriteLine("Your library is empty");
 
             consoleHelper.PressToContinue();
-            return false;
+            return true;
         }
 
         var exporter = SelectExporter();
         if (exporter is null)
         {
-            return false;
+            return true;
         }
 
         var filePath = BuildExportPath(exporter.FileExtension);
@@ -44,7 +44,7 @@ public class ExportLibrary(
         Console.WriteLine($"\nExport completed successfully! Saved to: {filePath}");
 
         consoleHelper.PressToContinue();
-        return false;
+        return true;
     }
 
     private IExporter? SelectExporter()

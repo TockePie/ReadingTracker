@@ -21,13 +21,14 @@ public class ReadingStatistics(
             Console.WriteLine("Your library is empty");
 
             consoleHelper.PressToContinue();
-            return false;
+            return true;
         }
 
         PrintStatistics(allBooks);
 
+        Console.WriteLine();
         consoleHelper.PressToContinue();
-        return false;
+        return true;
     }
 
     private void PrintStatistics(IReadOnlyList<Book> books)
